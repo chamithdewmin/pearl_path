@@ -262,15 +262,19 @@ async function recomputeRatingsForTarget(targetField, targetId) {
   }
 }
 
-// Ensure default admin user exists
+// Ensure default admin exists: admin@gmail.com / 12345678 (same on every device)
 async function ensureDefaultAdmin() {
   const adminEmail = 'admin@gmail.com';
-  const existing = await User.findOne({ email: adminEmail }).exec();
-  if (existing) {
-    return;
-  }
   const plainPassword = '12345678';
   const passwordHash = await bcrypt.hash(plainPassword, 10);
+  const existing = await User.findOne({ email: adminEmail }).exec();
+  if (existing) {
+    existing.passwordHash = passwordHash;
+    existing.role = 'admin';
+    await existing.save();
+    console.log('✅ Default admin updated:', adminEmail);
+    return;
+  }
   await User.create({
     email: adminEmail,
     passwordHash,

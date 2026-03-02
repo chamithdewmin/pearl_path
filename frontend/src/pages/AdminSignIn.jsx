@@ -10,7 +10,7 @@ export default function AdminSignIn() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/admin';
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('admin@gmail.com');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (e) => {
@@ -45,6 +45,7 @@ export default function AdminSignIn() {
           <h1 style={s.title}>Admin sign in</h1>
           <p style={s.subtitle}>Southern Tourism – Admin panel</p>
         </div>
+        <p style={s.hint}>Use the same admin account on any device: admin@gmail.com / 12345678</p>
         <form onSubmit={handleSubmit} style={s.form}>
           <input
             className="input-enterprise"
@@ -59,7 +60,7 @@ export default function AdminSignIn() {
             className="input-enterprise"
             style={s.input}
             type="password"
-            placeholder="Password"
+            placeholder="Password (default: 12345678)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -92,6 +93,12 @@ const s = {
   header: { textAlign: 'center', marginBottom: 'var(--space-6)' },
   title: { fontSize: 'var(--text-xl)', fontWeight: 700, marginTop: 'var(--space-3)' },
   subtitle: { fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' },
+  hint: {
+    fontSize: 'var(--text-xs)',
+    color: 'var(--color-text-muted)',
+    marginBottom: 'var(--space-3)',
+    textAlign: 'center',
+  },
   form: { display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' },
   input: { margin: 0 },
   btn: { width: '100%', marginTop: 'var(--space-2)' },

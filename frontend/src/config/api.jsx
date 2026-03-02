@@ -9,7 +9,8 @@ export const REVIEWS_API = `${API_ROOT}/reviews`;
 
 export function getAuthHeaders() {
   try {
-    const raw = localStorage.getItem('southern_tourism_user');
+    // Must match AuthContext: token is stored in sessionStorage at login
+    const raw = sessionStorage.getItem('southern_tourism_user');
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     const token = parsed?.token;
