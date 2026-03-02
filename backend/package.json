@@ -1,0 +1,23 @@
+{
+  "name": "pearl-path-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Pearl Path tourist management system (tourists, hotels, vehicles, guides, bookings, and reviews).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "tourism",
+    "southern-sri-lanka"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongoose": "^8.6.0",
+    "morgan": "^1.10.0"
+  }
+}

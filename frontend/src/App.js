@@ -1,0 +1,110 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import PublicNavbar from './components/PublicNavbar';
+
+import Home from './pages/Home';
+import AboutUs from './pages/AboutUs';
+import ContactUs from './pages/ContactUs';
+import AllInOne from './pages/AllInOne';
+import CarRental from './pages/CarRental';
+import Guides from './pages/Guides';
+import Province from './pages/Province';
+import Provinces from './pages/Provinces';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import AccountLayout from './pages/account/AccountLayout';
+import AccountOverview from './pages/account/AccountOverview';
+import AccountHotels from './pages/account/AccountHotels';
+import AccountVehicles from './pages/account/AccountVehicles';
+import AccountGuides from './pages/account/AccountGuides';
+import AccountBookings from './pages/account/AccountBookings';
+import AccountProfile from './pages/account/AccountProfile';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminGuides from './pages/admin/AdminGuides';
+import AdminVehicles from './pages/admin/AdminVehicles';
+import AdminHotels from './pages/admin/AdminHotels';
+import AdminBookings from './pages/admin/AdminBookings';
+
+const footerCols = [
+  { title: 'Support', links: [{ label: 'Contact us', to: '/contact' }, { label: 'Sign in', to: '/signin' }, { label: 'Register', to: '/signup' }] },
+  { title: 'Discover', links: [{ label: 'All-in-One package', to: '/all-in-one' }, { label: 'Southern Provinces', to: '/provinces' }] },
+  { title: 'Company', links: [{ label: 'About us', to: '/about' }, { label: 'Contact', to: '/contact' }] },
+  { title: 'Provinces', links: [{ label: 'Galle', to: '/provinces/galle' }, { label: 'Matara', to: '/provinces/matara' }, { label: 'Hambantota', to: '/provinces/hambantota' }] },
+  { title: 'Account', links: [{ label: 'My account', to: '/account' }, { label: 'Sign in', to: '/signin' }] },
+];
+
+function PublicLayout({ children }) {
+  return (
+    <div className="app-booking" style={layoutStyles.wrapper}>
+      <PublicNavbar />
+      <main style={layoutStyles.main}>{children}</main>
+      <footer className="footer-booking">
+        <div className="fg-booking">
+          {footerCols.map((col, i) => (
+            <div key={i} className="fc-booking">
+              <h4>{col.title}</h4>
+              {col.links.map((l, j) => (
+                <Link key={j} to={l.to}>{l.label}</Link>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="fb-booking">
+          <p>Southern Tourism — Stays, car rentals & guides across Galle, Matara & Hambantota.</p>
+          <p>© {new Date().getFullYear()} Southern Tourism. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+          <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
+          <Route path="/contact" element={<PublicLayout><ContactUs /></PublicLayout>} />
+          <Route path="/all-in-one" element={<PublicLayout><AllInOne /></PublicLayout>} />
+          <Route path="/car-rental" element={<PublicLayout><CarRental /></PublicLayout>} />
+          <Route path="/guides" element={<PublicLayout><Guides /></PublicLayout>} />
+          <Route path="/provinces" element={<PublicLayout><Provinces /></PublicLayout>} />
+          <Route path="/provinces/:slug" element={<PublicLayout><Province /></PublicLayout>} />
+          <Route path="/signin" element={<PublicLayout><SignIn /></PublicLayout>} />
+          <Route path="/signup" element={<PublicLayout><SignUp /></PublicLayout>} />
+
+          <Route path="/account" element={<AccountLayout />}>
+            <Route index element={<AccountOverview />} />
+            <Route path="hotels" element={<AccountHotels />} />
+            <Route path="vehicles" element={<AccountVehicles />} />
+            <Route path="guides" element={<AccountGuides />} />
+            <Route path="bookings" element={<AccountBookings />} />
+            <Route path="profile" element={<AccountProfile />} />
+          </Route>
+
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="guides" element={<AdminGuides />} />
+            <Route path="vehicles" element={<AdminVehicles />} />
+            <Route path="hotels" element={<AdminHotels />} />
+            <Route path="bookings" element={<AdminBookings />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+const layoutStyles = {
+  wrapper: { minHeight: '100vh', display: 'flex', flexDirection: 'column' },
+  main: { flex: 1 },
+};
+
+export default App;
