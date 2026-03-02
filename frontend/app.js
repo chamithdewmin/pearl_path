@@ -1,8 +1,17 @@
-// Use production API when running on the real domain, otherwise fall back to localhost for development.
-const API_BASE =
-  window.location.hostname === 'pearlpath.logozodev.com'
-    ? 'https://pearlpath.logozodev.com/api'
-    : 'http://localhost:4000/api';
+// Determine API base URL from current origin.
+// - On live (https://pearlpath.logozodev.com) -> https://pearlpath.logozodev.com/api
+// - On local dev (frontend at http://localhost:3000) -> http://localhost:4000/api
+let API_BASE;
+if (typeof window !== 'undefined') {
+  const origin = window.location.origin;
+  if (origin.includes('localhost:3000')) {
+    API_BASE = 'http://localhost:4000/api';
+  } else {
+    API_BASE = `${origin}/api`;
+  }
+} else {
+  API_BASE = 'http://localhost:4000/api';
+}
 
 // Auth helpers
 function getAuthToken() {

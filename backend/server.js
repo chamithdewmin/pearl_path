@@ -882,6 +882,11 @@ app.get('/api/search/guides', async (req, res) => {
   }
 });
 
+// API root (useful for platform health checks hitting /api)
+app.get('/api', (req, res) => {
+  res.json({ status: 'ok', message: 'Pearl Path API root' });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
