@@ -1,7 +1,7 @@
 import React from 'react';
 import { CalendarIcon, CheckIcon } from './Icons';
 
-const Booking = ({ bookings, loading }) => {
+const Booking = ({ bookings, loading, enableReview = false, onReview }) => {
   return (
     <div className="card-enterprise" style={styles.wrapper}>
       <div style={styles.tableWrap}>
@@ -13,6 +13,7 @@ const Booking = ({ bookings, loading }) => {
               <th style={styles.th}>Start date</th>
               <th style={styles.th}>End date</th>
               <th style={styles.th}>Status</th>
+              {enableReview && <th style={styles.th}>Review</th>}
             </tr>
           </thead>
           <tbody>
@@ -41,6 +42,7 @@ const Booking = ({ bookings, loading }) => {
                 const start = b.startDate ? new Date(b.startDate) : null;
                 const end = b.endDate ? new Date(b.endDate) : null;
 
+                const canReview = enableReview && b.status === 'completed';
                 return (
                   <tr key={b._id || b.id} style={styles.row}>
                     <td style={styles.td}>
@@ -80,6 +82,22 @@ const Booking = ({ bookings, loading }) => {
                         {b.status}
                       </span>
                     </td>
+                    {enableReview && (
+                      <td style={styles.td}>
+                        {canReview ? (
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            style={{ padding: '4px 8px', fontSize: 12 }}
+                            onClick={() => onReview && onReview(b)}
+                          >
+                            Leave review
+                          </button>
+                        ) : (
+                          <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>—</span>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 );
               })

@@ -1,11 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { WhatsAppIcon, EditIcon, DeleteIcon } from './Icons';
-import { API_ROOT } from '../config/api';
+import { API_ROOT, getAuthHeaders } from '../config/api';
+import { useAuth } from '../context/AuthContext';
 
 const Guide = ({ isAdmin, query }) => {
   const [guides, setGuides] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bookingTarget, setBookingTarget] = useState(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let cancelled = false;
@@ -28,8 +37,42 @@ const Guide = ({ isAdmin, query }) => {
   }, []);
 
   const handleContact = (name) => {
-    // Contact details are not stored yet; keep this as a future enhancement.
     alert(`Contact details for ${name} are not configured yet.`);
+  };
+
+  const handleOpenBooking = (guide) => {
+    if (!user) {
+      navigate('/signin', { replace: false });
+      return;
+    }
+    setBookingTarget(guide);
+    setStartDate('');
+    setEndDate('');
+  };
+
+  const handleCreateBooking = async (e) => {
+    e.preventDefault();
+    if (!bookingTarget || !startDate || !endDate) return;
+    setSubmitting(true);
+    try {
+      await axios.post(
+        `${API_ROOT}/bookings`,
+        {
+          tourist: user._id,
+          guide: bookingTarget._id,
+          startDate,
+          endDate,
+        },
+        { headers: getAuthHeaders() },
+      );
+      alert('Guide booking created. You can see it under My bookings.');
+      setBookingTarget(null);
+      navigate('/account/bookings');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Could not create booking. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const filtered = useMemo(() => {
@@ -106,7 +149,53 @@ const Guide = ({ isAdmin, query }) => {
           );
         })
       )}
+      ))}
     </div>
+    {bookingTarget && (
+      <div style={styles.modalOverlay}>
+        <div style={styles.modal}>
+          <h2 style={{ marginBottom: 8 }}>Book {bookingTarget.name}</h2>
+          <p style={{ marginBottom: 16, fontSize: 14, color: 'var(--color-text-muted)' }}>
+            Select the dates for your tour with this guide.
+          </p>
+          <form onSubmit={handleCreateBooking} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <label style={styles.modalLabel}>
+              Start date
+              <input
+                type="date"
+                className="input-enterprise"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                required
+              />
+            </label>
+            <label style={styles.modalLabel}>
+              End date
+              <input
+                type="date"
+                className="input-enterprise"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                required
+              />
+            </label>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setBookingTarget(null)}
+                disabled={submitting}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary" disabled={submitting}>
+                {submitting ? 'Booking...' : 'Confirm booking'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
   );
 };
 
@@ -125,6 +214,30 @@ const styles = {
   adminActions: { display: 'flex', gap: 'var(--space-2)' },
   editBtn: { flex: 1, padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--text-sm)', fontWeight: 600, background: 'var(--color-bg)', color: 'var(--color-text)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', cursor: 'pointer' },
   deleteBtn: { flex: 1, padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--text-sm)', fontWeight: 600, background: 'var(--color-error-bg)', color: 'var(--color-error)', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer' },
+  modalOverlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.35)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    width: '100%',
+    maxWidth: 420,
+    background: '#fff',
+    borderRadius: 12,
+    padding: 'var(--space-6)',
+    boxShadow: '0 20px 40px rgba(0,0,0,.25)',
+  },
+  modalLabel: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+    fontSize: 13,
+    color: 'var(--color-text-muted)',
+  },
 };
 
 export default Guide;

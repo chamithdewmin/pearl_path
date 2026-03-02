@@ -5,6 +5,7 @@ export const API_ROOT =
 
 export const TOURISM_USERS_API = `${API_ROOT}/tourism/users`;
 export const TOURISM_BOOKINGS_API = `${API_ROOT}/tourism/my-bookings`;
+export const REVIEWS_API = `${API_ROOT}/reviews`;
 
 export function getAuthHeaders() {
   try {

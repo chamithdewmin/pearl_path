@@ -33,14 +33,14 @@ export default function AdminBookings() {
     return 'Custom package';
   };
 
-  const handleMarkConfirmed = async (id) => {
+  const handleMarkCompleted = async (id) => {
     try {
       await axios.put(
         `${API_ROOT}/bookings/${id}`,
-        { status: 'confirmed' },
+        { status: 'completed' },
         { headers: getAuthHeaders() },
       );
-      setBookings((prev) => prev.map((b) => (b._id === id ? { ...b, status: 'confirmed' } : b)));
+      setBookings((prev) => prev.map((b) => (b._id === id ? { ...b, status: 'completed' } : b)));
     } catch (err) {
       alert(err.response?.data?.message || 'Could not update booking status.');
     }
@@ -87,9 +87,9 @@ export default function AdminBookings() {
                         type="button"
                         className="btn-primary icon-text"
                         style={s.approveBtn}
-                        onClick={() => handleMarkConfirmed(b._id)}
+                        onClick={() => handleMarkCompleted(b._id)}
                       >
-                        <CheckIcon size={16} color="#fff" /> Mark confirmed
+                        <CheckIcon size={16} color="#fff" /> Mark completed
                       </button>
                     )}
                   </td>

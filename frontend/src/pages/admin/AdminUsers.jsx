@@ -1,36 +1,117 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { EditIcon, DeleteIcon } from '../../components/Icons';
-
-const MOCK_USERS = [
-  { id: 1, fullName: 'Administrator', email: 'admin@gmail.com', role: 'ADMIN' },
-  { id: 2, fullName: 'Demo Tourist', email: 'tourist@gmail.com', role: 'TOURIST' },
-  { id: 3, fullName: 'Demo Guide', email: 'guide@gmail.com', role: 'GUIDE' },
-];
+import { API_ROOT, getAuthHeaders } from '../../config/api';
 
 export default function AdminUsers() {
-  const [users, setUsers] = useState(MOCK_USERS);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleDelete = (id) => { if (window.confirm('Delete user?')) setUsers((u) => u.filter((x) => x.id !== id)); };
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await axios.get(`${API_ROOT}/admin/users`, {
+          headers: getAuthHeaders(),
+        });
+        if (!cancelled) {
+          setUsers(res.data || []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to load users', err);
+          setUsers([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleRoleChange = async (id, nextRole) => {
+    try {
+      const res = await axios.put(
+        `${API_ROOT}/admin/users/${id}`,
+        { role: nextRole },
+        { headers: getAuthHeaders() },
+      );
+      setUsers((prev) => prev.map((u) => (u._id === id ? res.data : u)));
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update user role');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this user?')) return;
+    try {
+      await axios.delete(`${API_ROOT}/admin/users/${id}`, {
+        headers: getAuthHeaders(),
+      });
+      setUsers((prev) => prev.filter((u) => u._id !== id));
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete user');
+    }
+  };
 
   return (
     <div>
       <h1 style={s.title}>Users</h1>
-      <p style={s.subtitle}>Total registered: {users.length}</p>
+      <p style={s.subtitle}>
+        {loading ? 'Loading users...' : `Total registered: ${users.length}`}
+      </p>
       <div className="card-enterprise" style={s.tableWrap}>
         <table style={s.table}>
           <thead><tr><th style={s.th}>Name</th><th style={s.th}>Email</th><th style={s.th}>Role</th><th style={s.th}>Actions</th></tr></thead>
           <tbody>
-            {users.map((u) => (
-              <tr key={u.id} style={s.tr}>
-                <td style={s.td}>{u.fullName}</td>
-                <td style={s.td}>{u.email}</td>
-                <td style={s.td}><span className="pill pill-muted">{u.role}</span></td>
-                <td style={s.td}>
-                  <button type="button" style={s.iconBtn} title="Edit"><EditIcon size={18} /></button>
-                  <button type="button" style={s.iconBtn} onClick={() => handleDelete(u.id)} title="Delete"><DeleteIcon size={18} color="var(--color-error)" /></button>
-                </td>
+            {loading ? (
+              <tr>
+                <td colSpan={4} style={s.td}>Loading users...</td>
               </tr>
-            ))}
+            ) : users.length === 0 ? (
+              <tr>
+                <td colSpan={4} style={s.td}>No users found.</td>
+              </tr>
+            ) : (
+              users.map((u) => (
+                <tr key={u._id} style={s.tr}>
+                  <td style={s.td}>{u.name || '—'}</td>
+                  <td style={s.td}>{u.email}</td>
+                  <td style={s.td}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                      <span className="pill pill-muted" style={{ textTransform: 'capitalize' }}>
+                        {u.role}
+                      </span>
+                      <select
+                        value={u.role}
+                        onChange={(e) => handleRoleChange(u._id, e.target.value)}
+                        className="input-enterprise"
+                        style={{ padding: '4px 8px', fontSize: 12 }}
+                      >
+                        <option value="tourist">tourist</option>
+                        <option value="provider">provider</option>
+                        <option value="admin">admin</option>
+                      </select>
+                    </div>
+                  </td>
+                  <td style={s.td}>
+                    <button type="button" style={s.iconBtn} title="Edit">
+                      <EditIcon size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      style={s.iconBtn}
+                      onClick={() => handleDelete(u._id)}
+                      title="Delete"
+                    >
+                      <DeleteIcon size={18} color="var(--color-error)" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
