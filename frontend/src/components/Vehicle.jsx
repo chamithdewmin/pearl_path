@@ -5,7 +5,7 @@ import { LocationIcon, EditIcon, DeleteIcon, ChevronRightIcon } from './Icons';
 import { API_ROOT, getAuthHeaders } from '../config/api';
 import { useAuth } from '../context/AuthContext';
 
-const Vehicle = ({ isAdmin, query }) => {
+const Vehicle = ({ isAdmin, query, limit }) => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingTarget, setBookingTarget] = useState(null);
@@ -45,6 +45,8 @@ const Vehicle = ({ isAdmin, query }) => {
       return name.includes(q) || dist.includes(q);
     });
   }, [query, vehicles]);
+
+  const displayList = limit != null ? filtered.slice(0, limit) : filtered;
 
   const handleOpenBooking = (vehicle) => {
     if (!user) {
@@ -86,10 +88,10 @@ const Vehicle = ({ isAdmin, query }) => {
       <div style={styles.grid}>
       {loading ? (
         <div>Loading vehicles...</div>
-      ) : filtered.length === 0 ? (
+      ) : displayList.length === 0 ? (
         <div>No vehicles found.</div>
       ) : (
-        filtered.map((vehicle) => {
+        displayList.map((vehicle) => {
           const title = `${vehicle.type || ''} ${vehicle.model || ''}`.trim() || 'Vehicle';
           const img =
             vehicle.imageUrl ||

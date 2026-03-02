@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  IconBed,
+  HomeIcon,
   IconCar,
   HotelIcon,
   GuideIcon,
@@ -20,7 +20,7 @@ const PROVINCES = [
 ];
 
 const TABS = [
-  { label: 'Stays', to: '/', end: true, icon: <IconBed /> },
+  { label: 'Home', to: '/', end: true, icon: <HomeIcon size={18} color="currentColor" /> },
   { label: 'Hotel', to: '/hotels', end: true, icon: <HotelIcon size={18} color="currentColor" /> },
   { label: 'Car rental', to: '/car-rental', end: true, icon: <IconCar /> },
   { label: 'Guides', to: '/guides', end: true, icon: <GuideIcon size={18} color="currentColor" /> },

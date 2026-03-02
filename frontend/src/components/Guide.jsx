@@ -5,7 +5,7 @@ import { WhatsAppIcon, EditIcon, DeleteIcon } from './Icons';
 import { API_ROOT, getAuthHeaders } from '../config/api';
 import { useAuth } from '../context/AuthContext';
 
-const Guide = ({ isAdmin, query }) => {
+const Guide = ({ isAdmin, query, limit }) => {
   const [guides, setGuides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingTarget, setBookingTarget] = useState(null);
@@ -86,15 +86,17 @@ const Guide = ({ isAdmin, query }) => {
     });
   }, [query, guides]);
 
+  const displayList = limit != null ? filtered.slice(0, limit) : filtered;
+
   return (
     <>
       <div style={styles.grid}>
       {loading ? (
         <div>Loading guides...</div>
-      ) : filtered.length === 0 ? (
+      ) : displayList.length === 0 ? (
         <div>No guides found.</div>
       ) : (
-        filtered.map((guide) => {
+        displayList.map((guide) => {
           const img =
             guide.imageUrl ||
             'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&q=80';

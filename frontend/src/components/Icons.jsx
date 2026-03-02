@@ -8,6 +8,12 @@ const iconStyle = (size = 20, color = 'currentColor') => ({
   flexShrink: 0,
 });
 
+export const HomeIcon = ({ size, color, className }) => (
+  <svg viewBox="0 0 24 24" style={iconStyle(size, color)} className={className} aria-hidden="true">
+    <path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+  </svg>
+);
+
 export const SearchIcon = ({ size, color, className }) => (
   <svg viewBox="0 0 24 24" style={iconStyle(size, color)} className={className} aria-hidden="true">
     <path fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.2-5.2M11 19a8 8 0 100-16 8 8 0 000 16z" />

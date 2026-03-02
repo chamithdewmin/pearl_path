@@ -1,199 +1,89 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  IconMapPin,
-  IconCalendar,
-  IconUsers,
-  IconSearch,
-  IconHeart,
-  IconChevronRight,
-  IconX,
-  IconGift,
-} from '../components/Icons';
+import Hotel from '../components/Hotel';
+import Vehicle from '../components/Vehicle';
+import Guide from '../components/Guide';
+import { HotelIcon, CarIcon, GuideIcon, ChevronRightIcon } from '../components/Icons';
 
-// Image URLs (Unsplash)
-const I = {
-  galle: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=800&q=80',
-  matara: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80',
-  hambantota: 'https://images.unsplash.com/photo-1578645510447-e20b4656919f?w=800&q=80',
-  nuwara: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80',
-  negombo: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80',
-  ella: 'https://images.unsplash.com/photo-1609252509102-aa0ece2e3d66?w=800&q=80',
-  hotel1: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80',
-  hotel2: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80',
-  hotel3: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80',
-  hotel4: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&q=80',
-  typeHotel: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
-  typeApt: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80',
-  typeResort: 'https://images.unsplash.com/photo-1439130490301-25e322d88054?w=600&q=80',
-  typeVilla: 'https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?w=600&q=80',
-  cabin: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=600&q=80',
-  tree: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=600&q=80',
-  tiny: 'https://images.unsplash.com/photo-1520127629-d73a64ed8e39?w=600&q=80',
-  redHouse: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=80',
-  home1: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
-  home2: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80',
-  home3: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&q=80',
-  home4: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',
-  safari: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80',
-  beach: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80',
+const sectionStyle = {
+  marginBottom: 'var(--space-10)',
 };
 
-const weekendDeals = [
-  { name: 'Kandy Myst by Cinnamon', loc: 'Kandy, Sri Lanka', rating: '8.7', reviews: '311 reviews', price: 'LKR 53,492', orig: 'LKR 77,244', img: I.hotel1, deal: 'Great value', dType: 'gv' },
-  { name: '360 Viewpoint Queens Mount', loc: 'Kandy, Sri Lanka', rating: '9.1', reviews: '148 reviews', price: 'LKR 16,390', orig: 'LKR 21,000', img: I.hotel2, deal: 'Genius', dType: 'gn' },
-  { name: 'Viyona Boutique Hotel', loc: 'Kandy, Sri Lanka', rating: '9.3', reviews: '72 reviews', price: 'LKR 42,550', orig: null, img: I.hotel3, deal: 'Top pick', dType: 'tp' },
-  { name: 'The Darwin Heights', loc: 'Kandy, Sri Lanka', rating: '8.5', reviews: '13 reviews', price: 'LKR 35,623', orig: 'LKR 46,000', img: I.hotel4, deal: null, dType: '' },
-];
+const sectionHeader = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  flexWrap: 'wrap',
+  gap: 'var(--space-4)',
+  marginBottom: 'var(--space-6)',
+};
 
-const uniqueProps = [
-  { name: 'Domki Wierzyki Shelters', loc: 'Galle · Superb', img: I.cabin },
-  { name: 'Kenzoa w Dolinie', loc: 'Matara · Superb', img: I.tree },
-  { name: 'Tiny House Dreischwesternherz', loc: 'Hambantota · Superb', img: I.tiny },
-  { name: 'Das rote Haus Mintern Daich', loc: 'Galle · Wonderful', img: I.redHouse },
-];
+const sectionTitle = {
+  fontSize: 'var(--text-xl)',
+  fontWeight: 700,
+  color: 'var(--color-text)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 'var(--space-3)',
+};
 
-const homesLove = [
-  { name: 'Aparthotel Stare Miasto', loc: 'Galle Fort, Galle', rating: '8.5', label: 'Excellent', price: 'LKR 37,392', img: I.home1 },
-  { name: 'The Apartments by The Sloane Club', loc: 'Matara City', rating: '9.2', label: 'Superb', price: 'LKR 96,369', img: I.home2 },
-  { name: 'Cheval Three Quays at The Tower', loc: 'Hambantota', rating: '8.9', label: 'Wonderful', price: 'LKR 129,712', img: I.home3 },
-  { name: 'Oriente Palace Apartments', loc: 'Galle City Center', rating: '8.6', label: 'Excellent', price: 'LKR 34,981', img: I.home4 },
-];
-
-const propertyTypes = [
-  { label: 'Hotels', img: I.typeHotel, to: '/all-in-one' },
-  { label: 'Apartments', img: I.typeApt, to: '/all-in-one' },
-  { label: 'Resorts', img: I.typeResort, to: '/all-in-one' },
-  { label: 'Villas', img: I.typeVilla, to: '/all-in-one' },
-];
-
-const popularLinks = [
-  'Galle hotels', 'Matara hotels', 'Hambantota hotels', 'Kandy hotels',
-  'Negombo hotels', 'Hikkaduwa hotels', 'Nuwara Eliya hotels', 'Ella hotels',
-  'Mirissa hotels', 'Unawatuna hotels', 'Arugam Bay hotels', 'Weligama hotels',
-];
+const viewAllLink = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 14,
+  fontWeight: 600,
+  color: 'var(--color-primary)',
+  textDecoration: 'none',
+};
 
 export default function Home() {
-  const [dest, setDest] = useState('Galle');
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [trendTab, setTrendTab] = useState('Popular');
-  const [popTab, setPopTab] = useState('Popular cities');
-  const [wishlist, setWishlist] = useState({});
-  const [ctaVal, setCtaVal] = useState('');
-
-  const toggleWish = (id) => setWishlist((p) => ({ ...p, [id]: !p[id] }));
-
   return (
     <>
-      {/* HERO */}
-      <div className="hero-booking">
-        <h1>Find your next stay</h1>
-        <p>Search deals on hotels, homes, and much more across Southern Sri Lanka</p>
-
-        <div className="sb-booking">
-          <div className="sb-f-booking dest">
-            <span className="sb-ico-booking"><IconMapPin /></span>
-            <input
-              value={dest}
-              onChange={(e) => setDest(e.target.value)}
-              placeholder="Where are you going?"
-            />
-            {dest && (
-              <button type="button" className="sb-clr-booking" onClick={() => setDest('')} aria-label="Clear destination">
-                <IconX />
-              </button>
-            )}
-          </div>
-          <div className="sb-sep-booking" />
-          <div className="sb-f-booking date">
-            <span className="sb-ico-booking"><IconCalendar /></span>
-            <input
-              type="date"
-              value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
-              style={{ border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 14, background: 'transparent', width: '100%', color: checkIn ? '#1a1a2e' : '#aaa' }}
-            />
-          </div>
-          <div className="sb-sep-booking" />
-          <div className="sb-f-booking date">
-            <span className="sb-ico-booking"><IconCalendar /></span>
-            <input
-              type="date"
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
-              style={{ border: 'none', outline: 'none', fontFamily: 'inherit', fontSize: 14, background: 'transparent', width: '100%', color: checkOut ? '#1a1a2e' : '#aaa' }}
-            />
-          </div>
-          <div className="sb-sep-booking" />
-          <div className="sb-f-booking guests">
-            <span className="sb-ico-booking"><IconUsers /></span>
-            <span className="sb-gt-booking">2 adults · 0 children · 1 room</span>
-          </div>
-          <Link to="/all-in-one" className="sbtn-booking"><IconSearch /> Search</Link>
-        </div>
-        <div className="hero-spacer-booking" />
+      <div className="hero-booking" style={{ padding: 'var(--space-8) var(--space-6)' }}>
+        <h1>Southern Tourism</h1>
+        <p>Stays, car rentals and guides across Galle, Matara and Hambantota.</p>
       </div>
 
-      {/* MAIN */}
-      <div className="main-booking">
-
-        {/* Browse by property type */}
-        <section className="sec-booking">
-          <div className="sec-t-booking" style={{ marginBottom: 16 }}>Browse by property type</div>
-          <div className="tgrid-booking">
-            {propertyTypes.map((t, i) => (
-              <Link to={t.to} className="tc-booking" key={i}>
-                <img src={t.img} alt={t.label} />
-                <div className="tc-ov-booking">{t.label}</div>
-              </Link>
-            ))}
+      <div className="main-booking" style={{ padding: '0 var(--space-6) var(--space-10)' }}>
+        <section className="sec-booking" style={sectionStyle}>
+          <div style={sectionHeader}>
+            <h2 style={sectionTitle}>
+              <HotelIcon size={24} color="var(--color-primary)" />
+              Hotels
+            </h2>
+            <Link to="/hotels" style={viewAllLink}>
+              View all hotels <ChevronRightIcon size={18} />
+            </Link>
           </div>
+          <Hotel isAdmin={false} query="" limit={6} />
         </section>
 
-        {/* Trending destinations */}
-        <section className="sec-booking">
-          <div className="sec-t-booking">Trending destinations</div>
-          <div className="sec-sub-booking">Popular destinations to kickstart your planning</div>
-          <div className="ttabs-booking">
-            {['Popular', 'Explore Sri Lanka', 'Culinary Adventures', 'Adventurous Activities', 'Romantic Getaways', 'More ▾'].map((t) => (
-              <button key={t} type="button" className={`ttab-booking ${trendTab === t ? 'active' : ''}`} onClick={() => setTrendTab(t)}>{t}</button>
-            ))}
+        <section className="sec-booking" style={sectionStyle}>
+          <div style={sectionHeader}>
+            <h2 style={sectionTitle}>
+              <CarIcon size={24} color="var(--color-primary)" />
+              Vehicles
+            </h2>
+            <Link to="/car-rental" style={viewAllLink}>
+              View all vehicles <ChevronRightIcon size={18} />
+            </Link>
           </div>
-          <div className="dg2-booking">
-            {[
-              { name: 'Galle', img: I.galle, slug: 'galle' },
-              { name: 'Matara', img: I.matara, slug: 'matara' },
-            ].map((d) => (
-              <Link to={`/provinces/${d.slug}`} className="dc-booking big" key={d.slug}>
-                <img src={d.img} alt={d.name} />
-                <div className="dov-booking"><div className="dn-booking big">{d.name} <span className="fbadge-booking">🔥</span></div></div>
-              </Link>
-            ))}
-          </div>
+          <Vehicle isAdmin={false} query="" limit={6} />
         </section>
 
-        {/* Travel more banner */}
-        <section className="sec-booking">
-          <div className="tbanner-booking">
-            <div>
-              <h2>Travel more, spend less</h2>
-              <p>Sign in to save on stays and packages.<br />Register to book hotels, rent cars and chat with guides.</p>
-              <div className="tbtns-booking">
-                <Link to="/signin" className="tb-p-booking">Sign in</Link>
-                <Link to="/signup" className="tb-o-booking">Register</Link>
-              </div>
-            </div>
-            <div className="gbadge-booking">
-              <IconGift />
-              <div className="gbadge-t-booking">
-                <div>GENIUS</div>
-                <div>Level 1</div>
-              </div>
-            </div>
+        <section className="sec-booking" style={sectionStyle}>
+          <div style={sectionHeader}>
+            <h2 style={sectionTitle}>
+              <GuideIcon size={24} color="var(--color-primary)" />
+              Guides
+            </h2>
+            <Link to="/guides" style={viewAllLink}>
+              View all guides <ChevronRightIcon size={18} />
+            </Link>
           </div>
+          <Guide isAdmin={false} query="" limit={6} />
         </section>
-
       </div>
     </>
   );

@@ -5,7 +5,7 @@ import { LocationIcon, EditIcon, DeleteIcon, ChevronRightIcon, StarIcon } from '
 import { API_ROOT, getAuthHeaders } from '../config/api';
 import { useAuth } from '../context/AuthContext';
 
-const Hotel = ({ isAdmin, query }) => {
+const Hotel = ({ isAdmin, query, limit }) => {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingTarget, setBookingTarget] = useState(null);
@@ -48,6 +48,8 @@ const Hotel = ({ isAdmin, query }) => {
     });
   }, [query, hotels]);
 
+  const displayList = limit != null ? filtered.slice(0, limit) : filtered;
+
   const handleOpenBooking = (hotel) => {
     if (!user) {
       navigate('/signin', { replace: false });
@@ -88,10 +90,10 @@ const Hotel = ({ isAdmin, query }) => {
       <div style={styles.grid}>
       {loading ? (
         <div>Loading hotels...</div>
-      ) : filtered.length === 0 ? (
+      ) : displayList.length === 0 ? (
         <div>No hotels found.</div>
       ) : (
-        filtered.map((hotel) => {
+        displayList.map((hotel) => {
           const img =
             (hotel.images && hotel.images[0]) ||
             'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80';
