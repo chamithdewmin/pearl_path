@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TOURISM_USERS_API } from '../config/api';
-import { ProfileIcon } from '../components/Icons';
+import { ProfileIcon, GoogleIcon, FacebookIcon, AppleIcon } from '../components/Icons';
 import { useAuth } from '../context/AuthContext';
 
 export default function SignUp() {
@@ -82,21 +82,36 @@ export default function SignUp() {
             style={{ ...s.socialBtn, backgroundColor: '#fff', color: '#000', borderColor: '#ddd' }}
             onClick={() => alert('Google sign-in will be added here.')}
           >
-            Continue with Google
+            <span style={s.socialContent}>
+              <span style={s.socialIconCircle}>
+                <GoogleIcon size={16} />
+              </span>
+              <span>Continue with Google</span>
+            </span>
           </button>
           <button
             type="button"
             style={{ ...s.socialBtn, backgroundColor: '#1877f2', color: '#fff', borderColor: '#1877f2' }}
             onClick={() => alert('Facebook sign-in will be added here.')}
           >
-            Continue with Facebook
+            <span style={s.socialContent}>
+              <span style={s.socialIconCircle}>
+                <FacebookIcon size={16} />
+              </span>
+              <span>Continue with Facebook</span>
+            </span>
           </button>
           <button
             type="button"
             style={{ ...s.socialBtn, backgroundColor: '#000', color: '#fff', borderColor: '#000' }}
             onClick={() => alert('Apple sign-in will be added here.')}
           >
-            Continue with Apple
+            <span style={s.socialContent}>
+              <span style={s.socialIconCircle}>
+                <AppleIcon size={16} />
+              </span>
+              <span>Continue with Apple</span>
+            </span>
           </button>
         </div>
 
@@ -122,6 +137,8 @@ const s = {
   dividerText: { whiteSpace: 'nowrap' },
   socialRow: { display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' },
   socialBtn: { width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid transparent', fontSize: 14, fontWeight: 500, cursor: 'pointer' },
+  socialContent: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  socialIconCircle: { width: 24, height: 24, borderRadius: '50%', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   footer: { textAlign: 'center', marginTop: 'var(--space-4)', fontSize: 'var(--text-sm)' },
   link: { color: 'var(--color-primary)', fontWeight: 600 },
 };

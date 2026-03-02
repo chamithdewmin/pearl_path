@@ -110,6 +110,24 @@ export const WhatsAppIcon = ({ size, color, className }) => (
   </svg>
 );
 
+export const GoogleIcon = ({ size = 18, className }) => (
+  <svg viewBox="0 0 24 24" style={iconStyle(size, 'currentColor')} className={className} aria-hidden="true">
+    <path fill="#EA4335" d="M12 11.3v3.6h5.1C16.5 17.4 14.5 18.8 12 18.8c-3 0-5.5-2.4-5.5-5.5S9 7.8 12 7.8c1.6 0 2.9.6 3.8 1.4l2.6-2.6C16.8 5 14.6 4 12 4 7.6 4 4 7.6 4 12s3.6 8 8 8c4.6 0 7.7-3.2 7.7-7.7 0-.5 0-.9-.1-1.3H12z" />
+  </svg>
+);
+
+export const FacebookIcon = ({ size = 18, className }) => (
+  <svg viewBox="0 0 24 24" style={iconStyle(size, 'currentColor')} className={className} aria-hidden="true">
+    <path fill="#1877F2" d="M22 12C22 6.48 17.52 2 12 2S2 6.48 2 12c0 4.84 3.66 8.84 8.36 9.8v-6.93H8.08V12h2.28V9.79c0-2.25 1.34-3.5 3.4-3.5.99 0 2.02.18 2.02.18v2.22h-1.14c-1.12 0-1.47.7-1.47 1.41V12h2.5l-.4 2.87h-2.1v6.93C18.34 20.84 22 16.84 22 12z" />
+  </svg>
+);
+
+export const AppleIcon = ({ size = 18, className }) => (
+  <svg viewBox="0 0 24 24" style={iconStyle(size, 'currentColor')} className={className} aria-hidden="true">
+    <path fill="#000000" d="M16.5 2c0 1-.4 1.9-1 2.6-.7.8-1.9 1.4-2.9 1.3-.1-1 .4-2 .9-2.6.7-.8 1.9-1.4 3-1.4zM19.9 8.5c-.1.1-1.9 1.1-1.9 3.1 0 2.4 2.3 3.3 2.4 3.4 0 .1-.4 1.4-1.4 2.7-.8 1.1-1.6 2.2-2.9 2.2s-1.7-.7-3.1-.7-1.8.7-3 .7-2.1-1-2.9-2.1C5.2 15.9 4 13 4 10.4c0-2.4 1.6-3.6 3.1-3.6 1 .1 1.8.7 2.4.7.6 0 1.7-.8 3-.7 1.2.1 2.3.7 3 1.7z" />
+  </svg>
+);
+
 /* Booking.com-style stroke icons (18px default) */
 const strokeProps = { fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' };
 export const IconBed = () => (<svg width="18" height="18" viewBox="0 0 24 24" {...strokeProps}><path d="M2 9V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/><rect x="2" y="9" width="20" height="11" rx="2"/><path d="M2 15h20"/><path d="M6 9v6"/><path d="M18 9v6"/></svg>);
@@ -159,5 +177,8 @@ const Icons = {
   IconChevronRight,
   IconX,
   IconGift,
+  GoogleIcon,
+  FacebookIcon,
+  AppleIcon,
 };
 export default Icons;
