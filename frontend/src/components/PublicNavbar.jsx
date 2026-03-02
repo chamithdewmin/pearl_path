@@ -4,10 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import {
   IconBed,
   IconCar,
-  IconCompass,
-  IconGlobe,
   GuideIcon,
-  IconTaxi,
+  ProfileIcon,
+  BookingIcon,
+  IconGift,
+  IconHeart,
+  LogoutIcon,
 } from './Icons';
 
 const PROVINCES = [
@@ -23,10 +25,25 @@ const TABS = [
   { label: 'All-in-One', to: '/all-in-one', icon: null },
 ];
 
+const menuItemStyle = {
+  width: '100%',
+  padding: '8px 14px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  fontSize: 14,
+  color: '#1a1a2e',
+  textAlign: 'left',
+};
+
 export default function PublicNavbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [provincesOpen, setProvincesOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
 
   const displayName = user?.fullName || user?.name || user?.email || '';
 
@@ -92,23 +109,144 @@ export default function PublicNavbar() {
         </div>
         <div className="nav-actions-booking">
           {user ? (
-            <>
-              {displayName && (
-                <span style={{ color: '#fff', fontSize: 13, marginRight: 8 }}>
-                  {displayName}
-                </span>
-              )}
+            <div style={{ position: 'relative' }}>
               <button
                 type="button"
-                className="nbtn-booking out"
-                onClick={() => {
-                  logout();
-                  navigate('/');
+                onClick={() => setAccountOpen((open) => !open)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '6px 10px',
+                  borderRadius: 999,
                 }}
               >
-                Sign out
+                <span
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    backgroundColor: '#ffb700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#003580',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {(displayName || 'U').charAt(0)}
+                </span>
+                <span style={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {displayName}
+                </span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 10l5 5 5-5z" />
+                </svg>
               </button>
-            </>
+
+              {accountOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    background: '#fff',
+                    borderRadius: 12,
+                    boxShadow: '0 6px 20px rgba(0,0,0,.18)',
+                    padding: '6px 0',
+                    minWidth: 220,
+                    zIndex: 300,
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      navigate('/account');
+                    }}
+                    style={menuItemStyle}
+                  >
+                    <ProfileIcon size={18} />
+                    <span>My account</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      navigate('/account/bookings');
+                    }}
+                    style={menuItemStyle}
+                  >
+                    <BookingIcon size={18} />
+                    <span>Bookings &amp; Trips</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      navigate('/account');
+                    }}
+                    style={menuItemStyle}
+                  >
+                    <IconGift />
+                    <span>Genius loyalty program</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      navigate('/account');
+                    }}
+                    style={menuItemStyle}
+                  >
+                    <IconGift />
+                    <span>Rewards &amp; Wallet</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      navigate('/account/bookings');
+                    }}
+                    style={menuItemStyle}
+                  >
+                    <ProfileIcon size={18} />
+                    <span>Reviews</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      navigate('/account/hotels');
+                    }}
+                    style={menuItemStyle}
+                  >
+                    <IconHeart />
+                    <span>Saved</span>
+                  </button>
+                  <hr style={{ border: 0, borderTop: '1px solid #eee', margin: '4px 0' }} />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      logout();
+                      navigate('/');
+                    }}
+                    style={menuItemStyle}
+                  >
+                    <LogoutIcon size={18} />
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <>
               <Link to="/signup" className="nbtn-booking out">Register</Link>
