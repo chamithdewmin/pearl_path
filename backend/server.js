@@ -9,10 +9,11 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret_in_production';
 
-// Fixed MongoDB URL for production (Dokploy cluster)
-// If you need a different URL locally, set MONGODB_URI in your env.
+// Fixed MongoDB URL for production (Dokploy cluster).
+// Explicitly target the "pearl_path" database and authenticate against "admin",
+// which matches how most managed Mongo services create the initial user.
 const DEFAULT_MONGODB_URI =
-  'mongodb://pearl_path_user:QFvBV5Vk7v0TTZwzmKcw@pearl-path-database-12yohc:27017';
+  'mongodb://pearl_path_user:QFvBV5Vk7v0TTZwzmKcw@pearl-path-database-12yohc:27017/pearl_path?authSource=admin';
 const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 
 // Middleware
@@ -22,9 +23,7 @@ app.use(morgan('dev'));
 
 // MongoDB connection
 mongoose
-  .connect(MONGODB_URI, {
-    dbName: 'pearl_path',
-  })
+  .connect(MONGODB_URI)
   .then(async () => {
     console.log('✅ Connected to MongoDB');
     await ensureDefaultAdmin();
@@ -44,6 +43,9 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     passwordHash: { type: String, required: true },
     name: { type: String, trim: true },
+    phone: { type: String, trim: true },
+    address: { type: String, trim: true },
+    country: { type: String, trim: true },
     // Roles:
     // - admin: full system control
     // - tourist: regular traveller using the platform
@@ -279,7 +281,7 @@ async function ensureDefaultAdmin() {
 // Auth handlers (shared between multiple route prefixes)
 async function handleRegister(req, res) {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, phone, address, country } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -292,6 +294,9 @@ async function handleRegister(req, res) {
       email: email.toLowerCase(),
       passwordHash,
       name,
+      phone,
+      address,
+      country,
       role: 'tourist',
     });
     res.status(201).json({
@@ -332,6 +337,9 @@ async function handleLogin(req, res) {
         _id: user._id,
         email: user.email,
         name: user.name,
+        phone: user.phone,
+        address: user.address,
+        country: user.country,
         role: user.role,
       },
     });
@@ -346,6 +354,45 @@ app.post('/api/auth/login', handleLogin);
 
 app.post('/api/tourism/users/register', handleRegister);
 app.post('/api/tourism/users/login', handleLogin);
+
+// Current user profile (for "My profile" page)
+app.get('/api/tourism/users/me', authRequired, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.sub).select('-passwordHash').exec();
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.put('/api/tourism/users/me', authRequired, async (req, res) => {
+  try {
+    const { name, phone, address, country, newPassword } = req.body;
+    const user = await User.findById(req.user.sub).exec();
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (typeof name === 'string') user.name = name;
+    if (typeof phone === 'string') user.phone = phone;
+    if (typeof address === 'string') user.address = address;
+    if (typeof country === 'string') user.country = country;
+
+    if (newPassword && typeof newPassword === 'string' && newPassword.trim().length >= 8) {
+      user.passwordHash = await bcrypt.hash(newPassword.trim(), 10);
+    }
+
+    const saved = await user.save();
+    const plain = saved.toObject();
+    delete plain.passwordHash;
+    res.json(plain);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // Auth middleware
 function authRequired(req, res, next) {

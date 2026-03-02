@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import PublicNavbar from './components/PublicNavbar';
 
 import Home from './pages/Home';
@@ -61,6 +61,24 @@ function PublicLayout({ children }) {
   );
 }
 
+function RequireAuth({ children }) {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/signin" replace />;
+  }
+  return children;
+}
+
+function RequireAdmin({ children }) {
+  const { user } = useAuth();
+  const role = user?.role;
+  const isAdmin = role === 'ADMIN' || role === 'admin';
+  if (!isAdmin) {
+    return <Navigate to="/account" replace />;
+  }
+  return children;
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -77,8 +95,15 @@ function App() {
           <Route path="/signin" element={<PublicLayout><SignIn /></PublicLayout>} />
           <Route path="/signup" element={<PublicLayout><SignUp /></PublicLayout>} />
 
-          <Route path="/account" element={<AccountLayout />}>
-            <Route index element={<AccountOverview />} />
+          <Route
+            path="/account"
+            element={(
+              <RequireAuth>
+                <AccountLayout />
+              </RequireAuth>
+            )}
+          >
+            <Route index element={<AccountProfile />} />
             <Route path="hotels" element={<AccountHotels />} />
             <Route path="vehicles" element={<AccountVehicles />} />
             <Route path="guides" element={<AccountGuides />} />
@@ -86,7 +111,14 @@ function App() {
             <Route path="profile" element={<AccountProfile />} />
           </Route>
 
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route
+            path="/admin"
+            element={(
+              <RequireAdmin>
+                <AdminLayout />
+              </RequireAdmin>
+            )}
+          >
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="guides" element={<AdminGuides />} />

@@ -5,11 +5,18 @@ import DashboardLayout from '../../components/DashboardLayout';
 import AccountSidebar from '../../components/AccountSidebar';
 
 export default function AccountLayout() {
-  const { user, isLoggedIn, login } = useAuth();
+  const { auth, user, isLoggedIn, login } = useAuth();
 
   if (!isLoggedIn) return <Navigate to="/signin" state={{ from: '/account' }} replace />;
 
-  const setUser = (data) => login({ ...user, ...data });
+  const setUser = (data) => {
+    const nextUser = { ...(user || {}), ...data };
+    if (auth && auth.user) {
+      login({ ...auth, user: nextUser });
+    } else {
+      login(nextUser);
+    }
+  };
 
   return (
     <DashboardLayout sidebar={<AccountSidebar />} headerTitle="My account">

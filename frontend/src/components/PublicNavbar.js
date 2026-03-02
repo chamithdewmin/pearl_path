@@ -95,7 +95,12 @@ export default function PublicNavbar() {
           </button>
           {user ? (
             <>
-              <Link to="/account" className="nbtn-booking out">My account</Link>
+              <Link
+                to={user.role === 'ADMIN' || user.role === 'admin' ? '/admin' : '/account'}
+                className="nbtn-booking out"
+              >
+                {user.role === 'ADMIN' || user.role === 'admin' ? 'Admin panel' : 'My account'}
+              </Link>
               <button type="button" className="nbtn-booking out" onClick={() => { logout(); navigate('/'); }}>Sign out</button>
             </>
           ) : (

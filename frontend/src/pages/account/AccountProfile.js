@@ -1,22 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import axios from 'axios';
 import { ProfileIcon } from '../../components/Icons';
+import { TOURISM_USERS_API } from '../../config/api';
 
 export default function AccountProfile() {
   const { user, setUser } = useOutletContext();
   const [profileData, setProfileData] = useState({
-    ...user,
-    password: '',
+    fullName: user?.fullName || user?.name || '',
     phone: user?.phone || '+94 ',
     address: user?.address || '',
     country: user?.country || 'Sri Lanka',
+    newPassword: '',
     profilePic: null,
   });
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await axios.get(`${TOURISM_USERS_API}/me`, { withCredentials: false });
+        if (!isMounted) return;
+        const { name, phone, address, country } = res.data;
+        setProfileData((prev) => ({
+          ...prev,
+          fullName: name || prev.fullName,
+          phone: phone || prev.phone,
+          address: address || prev.address,
+          country: country || prev.country,
+        }));
+        setUser({
+          name: name || prev.fullName,
+          phone: phone || prev.phone,
+          address: address || prev.address,
+          country: country || prev.country,
+        });
+      } catch {
+        // ignore, use local state
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, [setUser]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setUser({ fullName: profileData.fullName, phone: profileData.phone, address: profileData.address, country: profileData.country });
-    alert('Profile updated.');
+    try {
+      const payload = {
+        name: profileData.fullName,
+        phone: profileData.phone,
+        address: profileData.address,
+        country: profileData.country,
+      };
+      if (profileData.newPassword) {
+        payload.newPassword = profileData.newPassword;
+      }
+      const res = await axios.put(`${TOURISM_USERS_API}/me`, payload, { withCredentials: false });
+      setUser({
+        name: res.data.name,
+        phone: res.data.phone,
+        address: res.data.address,
+        country: res.data.country,
+      });
+      setProfileData((prev) => ({ ...prev, newPassword: '' }));
+      alert('Profile updated.');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Could not update profile. Please try again.');
+    }
   };
 
   return (
@@ -60,7 +111,14 @@ export default function AccountProfile() {
               </div>
               <div style={s.field}>
                 <label style={s.label}>New password</label>
-                <input className="input-enterprise" style={s.input} type="password" placeholder="Leave blank to keep" onChange={(e) => setProfileData({ ...profileData, password: e.target.value })} />
+                <input
+                  className="input-enterprise"
+                  style={s.input}
+                  type="password"
+                  placeholder="Leave blank to keep"
+                  value={profileData.newPassword}
+                  onChange={(e) => setProfileData({ ...profileData, newPassword: e.target.value })}
+                />
               </div>
             </div>
             <button type="submit" className="btn-primary" style={s.saveBtn}>Save changes</button>
