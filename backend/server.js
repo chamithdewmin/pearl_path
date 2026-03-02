@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,12 +10,15 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret_in_production';
 
-// Fixed MongoDB URL for production (Dokploy cluster).
-// Explicitly target the "pearl_path" database and authenticate against "admin",
-// which matches how most managed Mongo services create the initial user.
+// Default for production (Dokploy). Use .env MONGODB_URI for Atlas.
 const DEFAULT_MONGODB_URI =
   'mongodb://pearl_path_user:QFvBV5Vk7v0TTZwzmKcw@pearl-path-database-12yohc:27017/pearl_path?authSource=admin';
-const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
+let MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
+// If MONGODB_PASSWORD is set, replace <db_password> in URI (fixes special characters in password)
+const dbPassword = process.env.MONGODB_PASSWORD;
+if (dbPassword != null && dbPassword !== '' && MONGODB_URI.includes('<db_password>')) {
+  MONGODB_URI = MONGODB_URI.replace('<db_password>', encodeURIComponent(dbPassword));
+}
 
 // Middleware
 app.use(cors());
