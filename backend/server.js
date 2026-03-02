@@ -9,7 +9,8 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret_in_production';
 
-// Use provided MongoDB URL by default, but allow override via env
+// Fixed MongoDB URL for production (Dokploy cluster)
+// If you need a different URL locally, set MONGODB_URI in your env.
 const DEFAULT_MONGODB_URI =
   'mongodb://pearl_path_user:QFvBV5Vk7v0TTZwzmKcw@pearl-path-database-12yohc:27017';
 const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
@@ -275,8 +276,8 @@ async function ensureDefaultAdmin() {
   console.log('✅ Default admin user created:', adminEmail);
 }
 
-// Auth routes
-app.post('/api/auth/register', async (req, res) => {
+// Auth handlers (shared between multiple route prefixes)
+async function handleRegister(req, res) {
   try {
     const { email, password, name } = req.body;
     if (!email || !password) {
@@ -302,9 +303,9 @@ app.post('/api/auth/register', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});
+}
 
-app.post('/api/auth/login', async (req, res) => {
+async function handleLogin(req, res) {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -337,7 +338,14 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});
+}
+
+// Auth routes (two prefixes: /api/auth/* and /api/tourism/users/*)
+app.post('/api/auth/register', handleRegister);
+app.post('/api/auth/login', handleLogin);
+
+app.post('/api/tourism/users/register', handleRegister);
+app.post('/api/tourism/users/login', handleLogin);
 
 // Auth middleware
 function authRequired(req, res, next) {
