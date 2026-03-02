@@ -39,13 +39,6 @@ const I = {
   beach: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80',
 };
 
-const stillInterested = [
-  { name: 'Yala Safari Stay', loc: 'Tissamaharama, Sri Lanka', rating: '8.7', reviews: '109 reviews', img: I.safari },
-  { name: 'Galle Fort Hotel', loc: 'Galle, Sri Lanka', rating: '8.5', reviews: '375 reviews', img: I.hotel2 },
-  { name: 'Coral Reef Beach Hotel', loc: 'Negombo, Sri Lanka', rating: '8.2', reviews: '204 reviews', img: I.beach },
-  { name: 'Ella Rock Boutique', loc: 'Ella, Sri Lanka', rating: '9.0', reviews: '88 reviews', img: I.hotel3 },
-];
-
 const weekendDeals = [
   { name: 'Kandy Myst by Cinnamon', loc: 'Kandy, Sri Lanka', rating: '8.7', reviews: '311 reviews', price: 'LKR 53,492', orig: 'LKR 77,244', img: I.hotel1, deal: 'Great value', dType: 'gv' },
   { name: '360 Viewpoint Queens Mount', loc: 'Kandy, Sri Lanka', rating: '9.1', reviews: '148 reviews', price: 'LKR 16,390', orig: 'LKR 21,000', img: I.hotel2, deal: 'Genius', dType: 'gn' },
@@ -145,31 +138,6 @@ export default function Home() {
       {/* MAIN */}
       <div className="main-booking">
 
-        {/* Still interested */}
-        <section className="sec-booking">
-          <div className="sec-hd-booking">
-            <div className="sec-t-booking">Still interested in these properties?</div>
-            <Link to="/all-in-one" className="see-all-booking">See all <IconChevronRight /></Link>
-          </div>
-          <div className="row-booking">
-            {stillInterested.map((p, i) => (
-              <Link to="/all-in-one" className="pc-booking" key={i}>
-                <img src={p.img} alt={p.name} />
-                <button type="button" className="wbtn-booking" onClick={(e) => { e.preventDefault(); toggleWish(`s${i}`); }} aria-label="Wishlist"><IconHeart filled={wishlist[`s${i}`]} /></button>
-                <div className="pc-b-booking">
-                  <h3>{p.name}</h3>
-                  <div className="ploc-booking">{p.loc}</div>
-                  <div className="rrow-booking">
-                    <span className="rbadge-booking">{p.rating}</span>
-                    <span className="rlabel-booking">Wonderful</span>
-                    <span className="rcnt-booking">{p.reviews}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
         {/* Browse by property type */}
         <section className="sec-booking">
           <div className="sec-t-booking" style={{ marginBottom: 16 }}>Browse by property type</div>
@@ -202,120 +170,6 @@ export default function Home() {
                 <div className="dov-booking"><div className="dn-booking big">{d.name} <span className="fbadge-booking">🔥</span></div></div>
               </Link>
             ))}
-          </div>
-          <div className="dg4-booking">
-            {[
-              { name: 'Hambantota', img: I.hambantota, slug: 'hambantota' },
-              { name: 'Nuwara Eliya', img: I.nuwara },
-              { name: 'Ella', img: I.ella },
-              { name: 'Negombo', img: I.negombo },
-            ].map((d, i) => (
-              <Link to={d.slug ? `/provinces/${d.slug}` : '/provinces'} className="dc-booking sm" key={d.name}>
-                <img src={d.img} alt={d.name} />
-                <div className="dov-booking"><div className="dn-booking sm">{d.name} <span className="fbadge-booking">🔥</span></div></div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Weekend deals */}
-        <section className="sec-booking">
-          <div className="sec-hd-booking">
-            <div>
-              <div className="sec-t-booking">Deals for the weekend</div>
-              <div className="sec-sub-booking" style={{ marginBottom: 0 }}>Save on stays. Search and book your next trip.</div>
-            </div>
-            <Link to="/all-in-one" className="see-all-booking">See all <IconChevronRight /></Link>
-          </div>
-          <div className="row-booking" style={{ marginTop: 16 }}>
-            {weekendDeals.map((p, i) => (
-              <Link to="/all-in-one" className="pc-booking" key={i} style={{ minWidth: 240, maxWidth: 240 }}>
-                <img src={p.img} alt={p.name} />
-                <button type="button" className="wbtn-booking" onClick={(e) => { e.preventDefault(); toggleWish(`w${i}`); }} aria-label="Wishlist"><IconHeart filled={wishlist[`w${i}`]} /></button>
-                <div className="pc-b-booking">
-                  {p.deal && <span className={`dtag-booking ${p.dType}`}>{p.deal}</span>}
-                  <h3>{p.name}</h3>
-                  <div className="ploc-booking">{p.loc}</div>
-                  <div className="rrow-booking">
-                    <span className="rbadge-booking">{p.rating}</span>
-                    <span className="rlabel-booking">Wonderful</span>
-                  </div>
-                  <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>{p.reviews}</div>
-                  <div className="pprice-booking">
-                    {p.orig && <span className="porig-booking">{p.orig}</span>}
-                    {p.price}
-                  </div>
-                  <div style={{ fontSize: 11, color: '#6b6b6b', marginTop: 2 }}>2 nights, 2 adults</div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Unique properties */}
-        <section className="sec-booking">
-          <div className="sec-hd-booking">
-            <div>
-              <div className="sec-t-booking">Stay at our top unique properties</div>
-              <div className="sec-sub-booking" style={{ marginBottom: 0 }}>From villas and cabins to beach houses across the South</div>
-            </div>
-            <Link to="/all-in-one" className="see-all-booking">See all <IconChevronRight /></Link>
-          </div>
-          <div className="ugrid-booking" style={{ marginTop: 16 }}>
-            {uniqueProps.map((u, i) => (
-              <Link to="/all-in-one" className="uc-booking" key={i}>
-                <img src={u.img} alt={u.name} />
-                <div className="uc-b-booking"><h4>{u.name}</h4><p>{u.loc}</p></div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Homes guests love */}
-        <section className="sec-booking">
-          <div className="sec-hd-booking">
-            <div className="sec-t-booking">Homes guests love</div>
-            <Link to="/all-in-one" className="see-all-booking">Discover homes <IconChevronRight /></Link>
-          </div>
-          <div className="row-booking">
-            {homesLove.map((h, i) => (
-              <Link to="/all-in-one" className="hc-booking" key={i}>
-                <img src={h.img} alt={h.name} />
-                <button type="button" className="wbtn-booking" onClick={(e) => { e.preventDefault(); toggleWish(`h${i}`); }} aria-label="Wishlist"><IconHeart filled={wishlist[`h${i}`]} /></button>
-                <div className="hc-b-booking">
-                  <h4>{h.name}</h4>
-                  <div className="hloc-booking">{h.loc}</div>
-                  <div className="rrow-booking">
-                    <span className="rbadge-booking">{h.rating}</span>
-                    <span className="rlabel-booking">{h.label}</span>
-                  </div>
-                  <div className="hprice-booking">Starting from {h.price}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA banner */}
-        <section className="sec-booking">
-          <div className="cta-booking">
-            <div>
-              <h2>Want to feel at home on your next adventure?</h2>
-              <div className="cta-form-booking">
-                <input className="cta-inp-booking" placeholder="Discover vacation rentals" value={ctaVal} onChange={(e) => setCtaVal(e.target.value)} />
-                <Link to="/all-in-one" className="cta-btn-booking">Discover</Link>
-              </div>
-            </div>
-            <svg width="150" height="130" viewBox="0 0 150 130" fill="none" aria-hidden="true">
-              <ellipse cx="75" cy="122" rx="55" ry="7" fill="#b8d4f0" opacity="0.5" />
-              <rect x="28" y="66" width="94" height="32" rx="10" fill="#febb02" />
-              <rect x="33" y="22" width="84" height="48" rx="10" fill="#f5a623" />
-              <rect x="20" y="57" width="20" height="38" rx="8" fill="#f5a623" />
-              <rect x="110" y="57" width="20" height="38" rx="8" fill="#f5a623" />
-              <rect x="38" y="96" width="12" height="22" rx="4" fill="#c67c00" />
-              <rect x="100" y="96" width="12" height="22" rx="4" fill="#c67c00" />
-              <rect x="38" y="26" width="74" height="14" rx="5" fill="rgba(255,255,255,.22)" />
-            </svg>
           </div>
         </section>
 

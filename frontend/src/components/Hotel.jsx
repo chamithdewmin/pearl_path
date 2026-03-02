@@ -1,47 +1,87 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import { LocationIcon, EditIcon, DeleteIcon, ChevronRightIcon, StarIcon } from './Icons';
-
-const hotelData = [
-  { id: 1, name: 'Pavana Hotel - Galle', location: 'Galle', price: 'LKR 12,000', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=600', description: 'Luxury stay near Galle Fort with ocean views and premium service.' },
-  { id: 2, name: 'Heaven Grade - Matara', location: 'Matara', price: 'LKR 8,500', img: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=600', description: 'Budget friendly comfort in the heart of Matara city center.' },
-  { id: 3, name: 'Sunset Villa - Hambantota', location: 'Hambantota', price: 'LKR 15,000', img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=600', description: 'Perfect sunset views and easy access to Yala safari tours.' },
-  { id: 4, name: 'Almayans Bungalow - Galle', location: 'Galle', price: 'LKR 10,000', img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=600', description: 'A peaceful retreat away from the city hustle.' },
-  { id: 5, name: 'The Blue Water Hotel', location: 'Waduwa / Southern Coast', price: 'LKR 45,000', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=600', description: 'Luxury 5-star experience with ocean views and infinity pool.' },
-  { id: 6, name: 'Jetwing Lighthouse', location: 'Galle Fort Area', price: 'LKR 55,000', img: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=600', description: 'Iconic Bawa design overlooking the Indian Ocean.' },
-  { id: 7, name: 'Mirissa Beach Villa', location: 'Mirissa / Weligama', price: 'LKR 12,000', img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=600', description: 'Budget-friendly stay just steps away from the surfing beach.' },
-  { id: 8, name: 'Cinnamon Wild Yala', location: 'Tissamaharama / Yala', price: 'LKR 38,000', img: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=600', description: 'A rustic wild experience near the Yala National Park entrance.' },
-  { id: 9, name: 'Amanwella Resort', location: 'Tangalle / Southern Coast', price: 'LKR 85,000', img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=600', description: 'Ultra-luxury suites with private pools and secluded beach access.' },
-  { id: 10, name: 'Unawatuna Surf Lodge', location: 'Unawatuna Beach', price: 'LKR 8,500', img: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=600', description: 'Perfect spot for backpackers and surf enthusiasts.' },
-];
+import { API_ROOT } from '../config/api';
 
 const Hotel = ({ isAdmin, query }) => {
+  const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await axios.get(`${API_ROOT}/hotels`);
+        if (!cancelled) {
+          setHotels(res.data || []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to load hotels for cards', err);
+          setHotels([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filtered = useMemo(() => {
-    if (!query?.trim()) return hotelData;
+    if (!query?.trim()) return hotels;
     const q = query.trim().toLowerCase();
-    return hotelData.filter((h) => h.name.toLowerCase().includes(q) || h.location.toLowerCase().includes(q));
-  }, [query]);
+    return (hotels || []).filter((h) => {
+      const name = (h.name || '').toLowerCase();
+      const loc = (h.location || h.district || '').toLowerCase();
+      return name.includes(q) || loc.includes(q);
+    });
+  }, [query, hotels]);
 
   return (
     <div style={styles.grid}>
-      {filtered.map((hotel) => (
-        <article key={hotel.id} className="card-enterprise" style={styles.card}>
-          <div style={styles.imgWrap}>
-            <img src={hotel.img} alt={hotel.name} style={styles.img} />
+      {loading ? (
+        <div>Loading hotels...</div>
+      ) : filtered.length === 0 ? (
+        <div>No hotels found.</div>
+      ) : (
+        filtered.map((hotel) => {
+          const img =
+            (hotel.images && hotel.images[0]) ||
+            'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80';
+          const districtLabel = hotel.district || 'Southern Province';
+          const locationLabel = hotel.location || '';
+          const priceLabel = typeof hotel.pricePerNight === 'number'
+            ? `LKR ${hotel.pricePerNight.toLocaleString('en-LK')}`
+            : hotel.pricePerNight || 'Contact for price';
+
+          const descParts = [];
+          if (hotel.address) descParts.push(hotel.address);
+          if (hotel.facilities && hotel.facilities.length) {
+            descParts.push(hotel.facilities.slice(0, 3).join(', '));
+          }
+          const description = descParts.join(' • ') || 'Comfortable stay in Southern Sri Lanka.';
+
+          return (
+            <article key={hotel._id} className="card-enterprise" style={styles.card}>
+              <div style={styles.imgWrap}>
+                <img src={img} alt={hotel.name} style={styles.img} />
             <span style={styles.locationBadge}>
               <LocationIcon size={14} color="currentColor" />
-              {hotel.location}
+                {districtLabel}
             </span>
             <div style={styles.rating}>
               <StarIcon size={14} color="var(--color-warning)" />
               <span>4.8</span>
             </div>
-          </div>
-          <div style={styles.body}>
-            <h3 style={styles.title}>{hotel.name}</h3>
-            <p style={styles.desc}>{hotel.description}</p>
-            <div style={styles.footer}>
-              <div style={styles.priceWrap}>
-                <span style={styles.price}>{hotel.price}</span>
+              </div>
+              <div style={styles.body}>
+                <h3 style={styles.title}>{hotel.name}</h3>
+                <p style={styles.desc}>{description}</p>
+                <div style={styles.footer}>
+                  <div style={styles.priceWrap}>
+                    <span style={styles.price}>{priceLabel}</span>
                 <span style={styles.unit}>/ night</span>
               </div>
               {isAdmin ? (
@@ -63,11 +103,13 @@ const Hotel = ({ isAdmin, query }) => {
                   See availability
                   <ChevronRightIcon size={18} color="#fff" />
                 </button>
-              )}
-            </div>
-          </div>
-        </article>
-      ))}
+                  )}
+                </div>
+              </div>
+            </article>
+          );
+        })
+      )}
     </div>
   );
 };

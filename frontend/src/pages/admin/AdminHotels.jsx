@@ -8,7 +8,7 @@ export default function AdminHotels() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
 
-  const emptyForm = { name: '', district: 'Galle', location: '', pricePerNight: '' };
+  const emptyForm = { name: '', district: 'Galle', location: '', pricePerNight: '', imageUrl: '' };
   const [form, setForm] = useState(emptyForm);
 
   const loadHotels = async () => {
@@ -35,6 +35,7 @@ export default function AdminHotels() {
       district: hotel.district || 'Galle',
       location: hotel.location || '',
       pricePerNight: hotel.pricePerNight ?? '',
+      imageUrl: (hotel.images && hotel.images[0]) || '',
     });
   };
 
@@ -55,6 +56,7 @@ export default function AdminHotels() {
       district: form.district,
       location: form.location,
       pricePerNight: Number(form.pricePerNight) || 0,
+      images: form.imageUrl ? [form.imageUrl] : [],
     };
     try {
       if (editing) {
@@ -113,6 +115,15 @@ export default function AdminHotels() {
               className="input-enterprise"
               value={form.pricePerNight}
               onChange={(e) => setForm({ ...form, pricePerNight: e.target.value })}
+            />
+          </div>
+          <div style={s.formField}>
+            <label style={s.label}>Image URL</label>
+            <input
+              className="input-enterprise"
+              value={form.imageUrl}
+              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+              placeholder="https://..."
             />
           </div>
           <button type="submit" className="btn-primary icon-text" style={s.saveBtn}>

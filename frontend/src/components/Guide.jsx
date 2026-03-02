@@ -1,67 +1,111 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import { WhatsAppIcon, EditIcon, DeleteIcon } from './Icons';
-
-const guideData = [
-  { id: 1, name: 'M M Dias Kumarasiri', skills: 'Historical Sites, Cultural Expert', experience: '10+ Years', phone: '+94771112223', img: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=400', status: 'Available' },
-  { id: 2, name: 'G L Prasad Indika', skills: 'Wildlife Safari, Yala Specialist', experience: '8 Years', phone: '+94713334445', img: 'https://images.unsplash.com/photo-1540560953457-3f94e2e1329a?q=80&w=400', status: 'On Tour' },
-  { id: 3, name: 'V Chandana Hewa', skills: 'Surfing, Coastal Navigation', experience: '5 Years', phone: '+94705556667', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400', status: 'Available' },
-  { id: 4, name: 'Sampath Liyanage', skills: 'Bird Watching, Sinharaja Expert', experience: '12 Years', phone: '+94767778889', img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400', status: 'Available' },
-  { id: 5, name: 'Ruwan Wickramasinghe', skills: 'Diving, Marine Life Expert', experience: '6 Years', phone: '+94721119990', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400', status: 'On Tour' },
-  { id: 6, name: 'Indika Rathnayake', skills: 'Adventure Hiking, Ella Specialist', experience: '7 Years', phone: '+94752223334', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400', status: 'Available' },
-];
+import { API_ROOT } from '../config/api';
 
 const Guide = ({ isAdmin, query }) => {
-  const handleContact = (phone, name) => {
-    const message = `Hello ${name}, I saw your profile on Southern Tourism and would like to book a tour.`;
-    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+  const [guides, setGuides] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await axios.get(`${API_ROOT}/guides`);
+        if (!cancelled) setGuides(res.data || []);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to load guides for cards', err);
+          setGuides([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleContact = (name) => {
+    // Contact details are not stored yet; keep this as a future enhancement.
+    alert(`Contact details for ${name} are not configured yet.`);
   };
 
   const filtered = useMemo(() => {
-    if (!query?.trim()) return guideData;
+    if (!query?.trim()) return guides;
     const q = query.trim().toLowerCase();
-    return guideData.filter((g) => g.name.toLowerCase().includes(q) || g.skills.toLowerCase().includes(q));
-  }, [query]);
+    return (guides || []).filter((g) => {
+      const name = (g.name || '').toLowerCase();
+      const skills = (g.skills || []).join(', ').toLowerCase();
+      const langs = (g.languages || []).join(', ').toLowerCase();
+      return name.includes(q) || skills.includes(q) || langs.includes(q);
+    });
+  }, [query, guides]);
 
   return (
     <div style={styles.grid}>
-      {filtered.map((guide) => (
-        <article key={guide.id} className="card-enterprise" style={styles.card}>
-          <div style={styles.imgWrap}>
-            <img src={guide.img} alt={guide.name} style={styles.img} />
-            <span className={guide.status === 'Available' ? 'pill pill-success' : 'pill pill-warning'} style={styles.status}>
-              {guide.status}
-            </span>
-          </div>
-          <div style={styles.body}>
-            <h3 style={styles.title}>{guide.name}</h3>
-            <p style={styles.skills}>{guide.skills}</p>
-            <p style={styles.experience}>Experience: {guide.experience}</p>
-            <div style={styles.footer}>
-              {isAdmin ? (
-                <div style={styles.adminActions}>
-                  <button type="button" style={styles.editBtn} className="icon-text">
-                    <EditIcon size={16} color="currentColor" /> Edit
-                  </button>
-                  <button type="button" style={styles.deleteBtn} className="icon-text">
-                    <DeleteIcon size={16} color="currentColor" /> Remove
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className="btn-primary icon-text"
-                  style={styles.contactBtn}
-                  disabled={guide.status !== 'Available'}
-                  onClick={() => handleContact(guide.phone, guide.name)}
+      {loading ? (
+        <div>Loading guides...</div>
+      ) : filtered.length === 0 ? (
+        <div>No guides found.</div>
+      ) : (
+        filtered.map((guide) => {
+          const img =
+            guide.imageUrl ||
+            'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&q=80';
+          const status = guide.availabilityStatus === 'unavailable' ? 'On Tour' : 'Available';
+          const skills =
+            (guide.skills && guide.skills.join(', ')) ||
+            (guide.languages && guide.languages.join(', ')) ||
+            '';
+          const experience =
+            typeof guide.yearsExperience === 'number'
+              ? `${guide.yearsExperience}+ Years`
+              : '';
+
+          return (
+            <article key={guide._id} className="card-enterprise" style={styles.card}>
+              <div style={styles.imgWrap}>
+                <img src={img} alt={guide.name} style={styles.img} />
+                <span
+                  className={status === 'Available' ? 'pill pill-success' : 'pill pill-warning'}
+                  style={styles.status}
                 >
-                  <WhatsAppIcon size={18} color="#fff" />
-                  Contact on WhatsApp
-                </button>
-              )}
-            </div>
-          </div>
-        </article>
-      ))}
+                  {status}
+                </span>
+              </div>
+              <div style={styles.body}>
+                <h3 style={styles.title}>{guide.name}</h3>
+                <p style={styles.skills}>{skills}</p>
+                {experience && <p style={styles.experience}>Experience: {experience}</p>}
+                <div style={styles.footer}>
+                  {isAdmin ? (
+                    <div style={styles.adminActions}>
+                      <button type="button" style={styles.editBtn} className="icon-text">
+                        <EditIcon size={16} color="currentColor" /> Edit
+                      </button>
+                      <button type="button" style={styles.deleteBtn} className="icon-text">
+                        <DeleteIcon size={16} color="currentColor" /> Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn-primary icon-text"
+                      style={styles.contactBtn}
+                      onClick={() => handleContact(guide.name)}
+                    >
+                      <WhatsAppIcon size={18} color="#fff" />
+                      Contact guide
+                    </button>
+                  )}
+                </div>
+              </div>
+            </article>
+          );
+        })
+      )}
     </div>
   );
 };

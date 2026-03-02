@@ -8,7 +8,7 @@ export default function AdminVehicles() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
 
-  const emptyForm = { type: 'car', model: '', district: 'Galle', pricePerDay: '', seats: '' };
+  const emptyForm = { type: 'car', model: '', district: 'Galle', pricePerDay: '', seats: '', imageUrl: '' };
   const [form, setForm] = useState(emptyForm);
 
   const loadVehicles = async () => {
@@ -36,6 +36,7 @@ export default function AdminVehicles() {
       district: vehicle.district || 'Galle',
       pricePerDay: vehicle.pricePerDay ?? '',
       seats: vehicle.seats ?? '',
+      imageUrl: vehicle.imageUrl || '',
     });
   };
 
@@ -57,6 +58,7 @@ export default function AdminVehicles() {
       district: form.district,
       pricePerDay: Number(form.pricePerDay) || 0,
       seats: Number(form.seats) || undefined,
+      imageUrl: form.imageUrl || undefined,
     };
     try {
       if (editing) {
@@ -127,6 +129,15 @@ export default function AdminVehicles() {
               className="input-enterprise"
               value={form.seats}
               onChange={(e) => setForm({ ...form, seats: e.target.value })}
+            />
+          </div>
+          <div style={s.formField}>
+            <label style={s.label}>Image URL</label>
+            <input
+              className="input-enterprise"
+              value={form.imageUrl}
+              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+              placeholder="https://..."
             />
           </div>
           <button type="submit" className="btn-primary icon-text" style={s.saveBtn}>

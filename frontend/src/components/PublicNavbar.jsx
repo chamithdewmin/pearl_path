@@ -191,28 +191,6 @@ export default function PublicNavbar() {
                     type="button"
                     onClick={() => {
                       setAccountOpen(false);
-                      navigate('/account');
-                    }}
-                    style={menuItemStyle}
-                  >
-                    <IconGift />
-                    <span>Genius loyalty program</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAccountOpen(false);
-                      navigate('/account');
-                    }}
-                    style={menuItemStyle}
-                  >
-                    <IconGift />
-                    <span>Rewards &amp; Wallet</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAccountOpen(false);
                       navigate('/account/bookings');
                     }}
                     style={menuItemStyle}

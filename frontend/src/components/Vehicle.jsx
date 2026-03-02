@@ -1,62 +1,104 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import { LocationIcon, EditIcon, DeleteIcon, ChevronRightIcon } from './Icons';
-
-const vehicleData = [
-  { id: 1, name: 'Luxury Toyota Premio', client: 'Speed Cabs & Tours - Matara', price: 'LKR 85 / km', img: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=600', description: 'Premium sedan for city tours and airport drops with A/C.' },
-  { id: 2, name: 'Toyota KDH Super Long', client: 'Luvic Rent A Car - Galle', price: 'LKR 110 / km', img: 'https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?q=80&w=600', description: 'Ideal for family groups (14 seater) with luxury seating.' },
-  { id: 3, name: 'Off-Road Safari Jeep', client: 'Vihan Poojan Safari - Hambantota', price: 'LKR 15,000 / Tour', img: 'https://images.unsplash.com/photo-1541443131876-44b03de101c5?q=80&w=600', description: 'Modified 4x4 for Yala and Udawalawe wildlife safaris.' },
-  { id: 4, name: 'Hybrid Honda Vezel', client: 'Southern Express - Galle', price: 'LKR 95 / km', img: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=600', description: 'Eco-friendly SUV for comfortable coastal travel.' },
-  { id: 5, name: 'Suzuki Alto (Budget)', client: 'Eco Rent - Matara', price: 'LKR 50 / km', img: 'https://images.unsplash.com/photo-1620050186938-48b48f5727d9?q=80&w=600', description: 'Economy choice for short distance city travel.' },
-  { id: 6, name: 'Micro Luxury Bus', client: 'Southern Tours - Hambantota', price: 'LKR 25,000 / Day', img: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=600', description: 'Executive 29-seater bus for corporate outings.' },
-];
+import { API_ROOT } from '../config/api';
 
 const Vehicle = ({ isAdmin, query }) => {
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await axios.get(`${API_ROOT}/vehicles`);
+        if (!cancelled) setVehicles(res.data || []);
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to load vehicles for cards', err);
+          setVehicles([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filtered = useMemo(() => {
-    if (!query?.trim()) return vehicleData;
+    if (!query?.trim()) return vehicles;
     const q = query.trim().toLowerCase();
-    return vehicleData.filter((v) => v.name.toLowerCase().includes(q) || v.client.toLowerCase().includes(q));
-  }, [query]);
+    return (vehicles || []).filter((v) => {
+      const name = `${v.type || ''} ${v.model || ''}`.toLowerCase();
+      const dist = (v.district || '').toLowerCase();
+      return name.includes(q) || dist.includes(q);
+    });
+  }, [query, vehicles]);
 
   return (
     <div style={styles.grid}>
-      {filtered.map((vehicle) => (
-        <article key={vehicle.id} className="card-enterprise" style={styles.card}>
-          <div style={styles.imgWrap}>
-            <img src={vehicle.img} alt={vehicle.name} style={styles.img} />
-            <span style={styles.priceBadge}>{vehicle.price}</span>
-          </div>
-          <div style={styles.body}>
-            <h3 style={styles.title}>{vehicle.name}</h3>
-            <p style={styles.client} className="icon-text">
-              <LocationIcon size={16} color="var(--color-primary)" />
-              {vehicle.client}
-            </p>
-            <p style={styles.desc}>{vehicle.description}</p>
-            <div style={styles.footer}>
-              {isAdmin ? (
-                <div style={styles.adminActions}>
-                  <button type="button" style={styles.editBtn} className="icon-text">
-                    <EditIcon size={16} color="currentColor" /> Edit
-                  </button>
-                  <button type="button" style={styles.deleteBtn} className="icon-text">
-                    <DeleteIcon size={16} color="currentColor" /> Remove
-                  </button>
+      {loading ? (
+        <div>Loading vehicles...</div>
+      ) : filtered.length === 0 ? (
+        <div>No vehicles found.</div>
+      ) : (
+        filtered.map((vehicle) => {
+          const title = `${vehicle.type || ''} ${vehicle.model || ''}`.trim() || 'Vehicle';
+          const img =
+            vehicle.imageUrl ||
+            'https://images.unsplash.com/photo-1542362567-b07e54358753?w=800&q=80';
+          const district = vehicle.district || 'Southern Province';
+          const priceLabel =
+            typeof vehicle.pricePerDay === 'number'
+              ? `LKR ${vehicle.pricePerDay.toLocaleString('en-LK')} / day`
+              : vehicle.pricePerDay || 'Contact for price';
+          const descParts = [];
+          if (vehicle.seats) descParts.push(`${vehicle.seats} seats`);
+          if (vehicle.availabilityStatus) descParts.push(vehicle.availabilityStatus);
+          const description = descParts.join(' • ') || 'Comfortable transport option.';
+
+          return (
+            <article key={vehicle._id} className="card-enterprise" style={styles.card}>
+              <div style={styles.imgWrap}>
+                <img src={img} alt={title} style={styles.img} />
+                <span style={styles.priceBadge}>{priceLabel}</span>
+              </div>
+              <div style={styles.body}>
+                <h3 style={styles.title}>{title}</h3>
+                <p style={styles.client} className="icon-text">
+                  <LocationIcon size={16} color="var(--color-primary)" />
+                  {district}
+                </p>
+                <p style={styles.desc}>{description}</p>
+                <div style={styles.footer}>
+                  {isAdmin ? (
+                    <div style={styles.adminActions}>
+                      <button type="button" style={styles.editBtn} className="icon-text">
+                        <EditIcon size={16} color="currentColor" /> Edit
+                      </button>
+                      <button type="button" style={styles.deleteBtn} className="icon-text">
+                        <DeleteIcon size={16} color="currentColor" /> Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn-primary icon-text"
+                      style={styles.bookBtn}
+                      onClick={() => alert(`Checking availability for ${title}...`)}
+                    >
+                      Rent now
+                      <ChevronRightIcon size={18} color="#fff" />
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <button
-                  type="button"
-                  className="btn-primary icon-text"
-                  style={styles.bookBtn}
-                  onClick={() => alert(`Checking availability for ${vehicle.name}...`)}
-                >
-                  Rent now
-                  <ChevronRightIcon size={18} color="#fff" />
-                </button>
-              )}
-            </div>
-          </div>
-        </article>
-      ))}
+              </div>
+            </article>
+          );
+        })
+      )}
     </div>
   );
 };

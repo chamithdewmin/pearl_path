@@ -8,7 +8,7 @@ export default function AdminGuides() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
 
-  const emptyForm = { name: '', district: 'Galle', languages: '', pricePerDay: '' };
+  const emptyForm = { name: '', district: 'Galle', languages: '', pricePerDay: '', imageUrl: '' };
   const [form, setForm] = useState(emptyForm);
 
   const loadGuides = async () => {
@@ -35,6 +35,7 @@ export default function AdminGuides() {
       district: g.district || 'Galle',
       languages: (g.languages || []).join(', '),
       pricePerDay: g.pricePerDay ?? '',
+      imageUrl: g.imageUrl || '',
     });
   };
 
@@ -58,6 +59,7 @@ export default function AdminGuides() {
         .map((x) => x.trim())
         .filter(Boolean),
       pricePerDay: Number(form.pricePerDay) || 0,
+      imageUrl: form.imageUrl || undefined,
     };
     try {
       if (editing) {
@@ -117,6 +119,15 @@ export default function AdminGuides() {
               className="input-enterprise"
               value={form.pricePerDay}
               onChange={(e) => setForm({ ...form, pricePerDay: e.target.value })}
+            />
+          </div>
+          <div style={s.formField}>
+            <label style={s.label}>Image URL</label>
+            <input
+              className="input-enterprise"
+              value={form.imageUrl}
+              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+              placeholder="https://..."
             />
           </div>
           <button type="submit" className="btn-primary icon-text" style={s.saveBtn}>
