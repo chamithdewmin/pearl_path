@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = 'https://backend.peralpath.syaa.lk/api';
 
 // Utility helpers
 async function apiRequest(path, options = {}) {
