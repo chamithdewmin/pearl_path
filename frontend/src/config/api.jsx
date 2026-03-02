@@ -4,4 +4,5 @@ const API_ROOT =
   'https://demo.logozodev.com/api';
 
 export const TOURISM_USERS_API = `${API_ROOT}/tourism/users`;
+export const TOURISM_BOOKINGS_API = `${API_ROOT}/tourism/my-bookings`;
 

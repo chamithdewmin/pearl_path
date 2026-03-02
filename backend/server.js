@@ -734,6 +734,23 @@ app.get('/api/reviews', async (req, res) => {
   }
 });
 
+// ---- Tourist-facing booking routes ----
+
+// List bookings for the currently authenticated user (tourist portal)
+app.get('/api/tourism/my-bookings', authRequired, async (req, res) => {
+  try {
+    const bookings = await Booking.find({ tourist: req.user.sub })
+      .populate('hotel')
+      .populate('vehicle')
+      .populate('guide')
+      .sort({ startDate: -1 })
+      .exec();
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Get single review
 app.get('/api/reviews/:id', async (req, res) => {
   try {
