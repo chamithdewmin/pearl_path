@@ -1,9 +1,13 @@
 FROM nginx:alpine
 
-# Copy the built frontend app (e.g. React/Vite build output)
-# Make sure you run `npm run build` (or equivalent) BEFORE building this image
-# so that the `build/` folder exists next to this Dockerfile.
-COPY build/ /usr/share/nginx/html/
+WORKDIR /usr/share/nginx/html
+
+# This project is a static HTML/JS/CSS frontend.
+# We copy the files directly instead of relying on a build/ folder.
+COPY index.html ./index.html
+COPY app.js ./app.js
+COPY styles.css ./styles.css
 
 EXPOSE 80
+
 
