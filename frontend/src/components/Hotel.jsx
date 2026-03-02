@@ -84,7 +84,8 @@ const Hotel = ({ isAdmin, query }) => {
   };
 
   return (
-    <div style={styles.grid}>
+    <>
+      <div style={styles.grid}>
       {loading ? (
         <div>Loading hotels...</div>
       ) : filtered.length === 0 ? (
@@ -126,27 +127,27 @@ const Hotel = ({ isAdmin, query }) => {
                 <div style={styles.footer}>
                   <div style={styles.priceWrap}>
                     <span style={styles.price}>{priceLabel}</span>
-                <span style={styles.unit}>/ night</span>
-              </div>
-              {isAdmin ? (
-                <div style={styles.adminActions}>
-                  <button type="button" style={styles.editBtn} className="icon-text" aria-label="Edit">
-                    <EditIcon size={16} color="currentColor" /> Edit
-                  </button>
-                  <button type="button" style={styles.deleteBtn} className="icon-text" aria-label="Delete">
-                    <DeleteIcon size={16} color="currentColor" /> Delete
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className="btn-primary icon-text"
-                  style={styles.bookBtn}
-                  onClick={() => handleOpenBooking(hotel)}
-                >
-                  See availability
-                  <ChevronRightIcon size={18} color="#fff" />
-                </button>
+                    <span style={styles.unit}>/ night</span>
+                  </div>
+                  {isAdmin ? (
+                    <div style={styles.adminActions}>
+                      <button type="button" style={styles.editBtn} className="icon-text" aria-label="Edit">
+                        <EditIcon size={16} color="currentColor" /> Edit
+                      </button>
+                      <button type="button" style={styles.deleteBtn} className="icon-text" aria-label="Delete">
+                        <DeleteIcon size={16} color="currentColor" /> Delete
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn-primary icon-text"
+                      style={styles.bookBtn}
+                      onClick={() => handleOpenBooking(hotel)}
+                    >
+                      See availability
+                      <ChevronRightIcon size={18} color="#fff" />
+                    </button>
                   )}
                 </div>
               </div>
@@ -154,53 +155,53 @@ const Hotel = ({ isAdmin, query }) => {
           );
         })
       )}
-      ))}
-    </div>
-    {bookingTarget && (
-      <div style={styles.modalOverlay}>
-        <div style={styles.modal}>
-          <h2 style={{ marginBottom: 8 }}>Book {bookingTarget.name}</h2>
-          <p style={{ marginBottom: 16, fontSize: 14, color: 'var(--color-text-muted)' }}>
-            Select your check‑in and check‑out dates.
-          </p>
-          <form onSubmit={handleCreateBooking} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <label style={styles.modalLabel}>
-              Check‑in
-              <input
-                type="date"
-                className="input-enterprise"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
-            </label>
-            <label style={styles.modalLabel}>
-              Check‑out
-              <input
-                type="date"
-                className="input-enterprise"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-              />
-            </label>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => setBookingTarget(null)}
-                disabled={submitting}
-              >
-                Cancel
-              </button>
-              <button type="submit" className="btn-primary" disabled={submitting}>
-                {submitting ? 'Booking...' : 'Confirm booking'}
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
-    )}
+      {bookingTarget && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <h2 style={{ marginBottom: 8 }}>Book {bookingTarget.name}</h2>
+            <p style={{ marginBottom: 16, fontSize: 14, color: 'var(--color-text-muted)' }}>
+              Select your check‑in and check‑out dates.
+            </p>
+            <form onSubmit={handleCreateBooking} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <label style={styles.modalLabel}>
+                Check‑in
+                <input
+                  type="date"
+                  className="input-enterprise"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  required
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                Check‑out
+                <input
+                  type="date"
+                  className="input-enterprise"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  required
+                />
+              </label>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setBookingTarget(null)}
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary" disabled={submitting}>
+                  {submitting ? 'Booking...' : 'Confirm booking'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

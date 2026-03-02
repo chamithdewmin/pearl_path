@@ -82,7 +82,8 @@ const Vehicle = ({ isAdmin, query }) => {
   };
 
   return (
-    <div style={styles.grid}>
+    <>
+      <div style={styles.grid}>
       {loading ? (
         <div>Loading vehicles...</div>
       ) : filtered.length === 0 ? (
@@ -143,53 +144,53 @@ const Vehicle = ({ isAdmin, query }) => {
           );
         })
       )}
-      ))}
-    </div>
-    {bookingTarget && (
-      <div style={styles.modalOverlay}>
-        <div style={styles.modal}>
-          <h2 style={{ marginBottom: 8 }}>Book {`${bookingTarget.type || ''} ${bookingTarget.model || ''}`.trim()}</h2>
-          <p style={{ marginBottom: 16, fontSize: 14, color: 'var(--color-text-muted)' }}>
-            Select the start and end dates for your rental.
-          </p>
-          <form onSubmit={handleCreateBooking} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <label style={styles.modalLabel}>
-              Start date
-              <input
-                type="date"
-                className="input-enterprise"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
-            </label>
-            <label style={styles.modalLabel}>
-              End date
-              <input
-                type="date"
-                className="input-enterprise"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-              />
-            </label>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => setBookingTarget(null)}
-                disabled={submitting}
-              >
-                Cancel
-              </button>
-              <button type="submit" className="btn-primary" disabled={submitting}>
-                {submitting ? 'Booking...' : 'Confirm booking'}
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
-    )}
+      {bookingTarget && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <h2 style={{ marginBottom: 8 }}>Book {`${bookingTarget.type || ''} ${bookingTarget.model || ''}`.trim()}</h2>
+            <p style={{ marginBottom: 16, fontSize: 14, color: 'var(--color-text-muted)' }}>
+              Select the start and end dates for your rental.
+            </p>
+            <form onSubmit={handleCreateBooking} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <label style={styles.modalLabel}>
+                Start date
+                <input
+                  type="date"
+                  className="input-enterprise"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  required
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                End date
+                <input
+                  type="date"
+                  className="input-enterprise"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  required
+                />
+              </label>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setBookingTarget(null)}
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary" disabled={submitting}>
+                  {submitting ? 'Booking...' : 'Confirm booking'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
