@@ -3,17 +3,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TOURISM_USERS_API } from '../config/api';
 import { ProfileIcon } from '../components/Icons';
+import { useAuth } from '../context/AuthContext';
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [form, setForm] = useState({ fullName: '', email: '', password: '', phone: '', address: '', country: 'Sri Lanka', role: 'TOURIST' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${TOURISM_USERS_API}/register`, form);
-      alert('Account created. Sign in now.');
-      navigate('/signin');
+      const payload = {
+        email: form.email,
+        password: form.password,
+        name: form.fullName,
+        phone: form.phone,
+        address: form.address,
+        country: form.country,
+      };
+      const res = await axios.post(`${TOURISM_USERS_API}/register`, payload);
+      login(res.data);
+      navigate('/account');
     } catch (err) {
       alert(err.response?.data?.message || 'Registration failed.');
     }

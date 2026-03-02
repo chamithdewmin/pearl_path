@@ -299,11 +299,22 @@ async function handleRegister(req, res) {
       country,
       role: 'tourist',
     });
+    const token = jwt.sign(
+      { sub: user._id.toString(), role: user.role, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
     res.status(201).json({
-      _id: user._id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
+      token,
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        address: user.address,
+        country: user.country,
+        role: user.role,
+      },
     });
   } catch (err) {
     res.status(500).json({ message: err.message });

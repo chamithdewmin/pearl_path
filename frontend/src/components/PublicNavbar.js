@@ -29,6 +29,8 @@ export default function PublicNavbar() {
   const navigate = useNavigate();
   const [provincesOpen, setProvincesOpen] = useState(false);
 
+  const displayName = user?.fullName || user?.name || user?.email || '';
+
   return (
     <nav className="nav-booking">
       <div className="nav-booking-inner">
@@ -95,6 +97,11 @@ export default function PublicNavbar() {
           </button>
           {user ? (
             <>
+              {displayName && (
+                <span style={{ color: '#fff', fontSize: 13, marginRight: 8 }}>
+                  {displayName}
+                </span>
+              )}
               <Link
                 to={user.role === 'ADMIN' || user.role === 'admin' ? '/admin' : '/account'}
                 className="nbtn-booking out"
