@@ -7,29 +7,30 @@ export default function AllInOne() {
       <div style={s.container}>
         <h1 style={s.title}>All-in-One Package</h1>
         <p style={s.subtitle}>
-          Use your account to build a custom package from real data in the system. First browse hotels, then vehicles,
-          then guides – every booking you make is stored in the database and visible under &quot;My bookings&quot;.
+          Follow these steps on one flow: first book your hotel, then your vehicle, then your guide, and finally review
+          all bookings together in the confirmation page under &quot;My bookings&quot;.
         </p>
 
         <div className="card-enterprise" style={s.card}>
           <ol style={s.list}>
             <li>
-              <strong>Browse stays:</strong> Go to <Link to="/account/hotels">My account → Hotels</Link> and pick a
-              hotel you like. Use &quot;See availability&quot; to create a booking.
+              <strong>Step 1 – Book your hotel:</strong> Go to <Link to="/account/hotels">My account → Hotels</Link>{' '}
+              and pick a hotel you like. Use &quot;See availability&quot; to create your first booking.
             </li>
             <li>
-              <strong>Add transport:</strong> Visit <Link to="/account/vehicles">My account → Transport</Link> or the{' '}
-              <Link to="/car-rental">Car rental</Link> page and book a vehicle. These cards are powered by the vehicles
-              you add in the admin panel.
+              <strong>Step 2 – Book your vehicle:</strong> Visit{' '}
+              <Link to="/account/vehicles">My account → Transport</Link> or the <Link to="/car-rental">Car rental</Link>{' '}
+              page and book a vehicle for the same dates.
             </li>
             <li>
-              <strong>Select guides:</strong> Explore <Link to="/account/guides">My account → Guides</Link> or the{' '}
-              <Link to="/guides">Guides</Link> page to see guides from your database and make guide bookings.
+              <strong>Step 3 – Book your guide:</strong> Explore <Link to="/account/guides">My account → Guides</Link>{' '}
+              or the <Link to="/guides">Guides</Link> page to see guides from your database and add a guide booking.
             </li>
             <li>
-              <strong>Review everything:</strong> Open <Link to="/account/bookings">My account → My bookings</Link> to
-              see all bookings together. Completed bookings can be reviewed and those reviews feed back into hotel,
-              vehicle and guide ratings.
+              <strong>Step 4 – Booking confirmation:</strong> Open{' '}
+              <Link to="/account/bookings">My account → My bookings</Link> to see hotel, vehicle and guide bookings
+              together. Completed bookings can be reviewed, and those reviews feed back into hotel, vehicle and guide
+              ratings.
             </li>
           </ol>
           <p style={s.note}>
