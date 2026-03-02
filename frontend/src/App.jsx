@@ -10,6 +10,7 @@ import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
 import AllInOne from './pages/AllInOne';
 import CarRental from './pages/CarRental';
+import Hotels from './pages/Hotels';
 import Guides from './pages/Guides';
 import Province from './pages/Province';
 import Provinces from './pages/Provinces';
@@ -143,6 +144,7 @@ function App() {
             <Route path="/contact" element={<PublicLayout><ContactUs /></PublicLayout>} />
             <Route path="/all-in-one" element={<PublicLayout><AllInOne /></PublicLayout>} />
             <Route path="/car-rental" element={<PublicLayout><CarRental /></PublicLayout>} />
+            <Route path="/hotels" element={<PublicLayout><Hotels /></PublicLayout>} />
             <Route path="/guides" element={<PublicLayout><Guides /></PublicLayout>} />
             <Route path="/provinces" element={<PublicLayout><Provinces /></PublicLayout>} />
             <Route path="/provinces/:slug" element={<PublicLayout><Province /></PublicLayout>} />

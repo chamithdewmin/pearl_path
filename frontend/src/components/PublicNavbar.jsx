@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   IconBed,
   IconCar,
+  HotelIcon,
   GuideIcon,
   ProfileIcon,
   BookingIcon,
@@ -20,6 +21,7 @@ const PROVINCES = [
 
 const TABS = [
   { label: 'Stays', to: '/', end: true, icon: <IconBed /> },
+  { label: 'Hotel', to: '/hotels', end: true, icon: <HotelIcon size={18} color="currentColor" /> },
   { label: 'Car rental', to: '/car-rental', end: true, icon: <IconCar /> },
   { label: 'Guides', to: '/guides', end: true, icon: <GuideIcon size={18} color="currentColor" /> },
   { label: 'All-in-One', to: '/all-in-one', icon: null },
