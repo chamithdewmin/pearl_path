@@ -7,7 +7,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install && npm cache clean --force
+# Skip postinstall scripts because scripts/postinstall.js is not present in this repo
+RUN npm install --ignore-scripts && npm cache clean --force
 
 COPY . .
 
