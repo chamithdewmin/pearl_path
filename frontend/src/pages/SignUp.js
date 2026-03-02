@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { TOURISM_USERS_API } from '../config/api';
 import { ProfileIcon } from '../components/Icons';
 
 export default function SignUp() {
@@ -10,7 +11,7 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8081/api/tourism/users/register', form);
+      await axios.post(`${TOURISM_USERS_API}/register`, form);
       alert('Account created. Sign in now.');
       navigate('/signin');
     } catch (err) {

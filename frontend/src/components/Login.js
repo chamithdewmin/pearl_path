@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { TOURISM_USERS_API } from '../config/api';
 import { HotelIcon, ProfileIcon } from './Icons';
 
 const Login = ({ onLoginSuccess }) => {
@@ -28,14 +29,13 @@ const Login = ({ onLoginSuccess }) => {
       return;
     }
 
-    const baseUrl = 'http://localhost:8081/api/tourism/users';
     try {
       if (isRegistering) {
-        await axios.post(`${baseUrl}/register`, formData);
+        await axios.post(`${TOURISM_USERS_API}/register`, formData);
         alert('Registration successful. You can sign in now.');
         setIsRegistering(false);
       } else {
-        const res = await axios.post(`${baseUrl}/login`, {
+        const res = await axios.post(`${TOURISM_USERS_API}/login`, {
           email: formData.email.trim(),
           password: formData.password,
         });

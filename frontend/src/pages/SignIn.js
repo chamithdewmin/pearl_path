@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { TOURISM_USERS_API } from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import { ProfileIcon } from '../components/Icons';
 
@@ -29,7 +30,10 @@ export default function SignIn() {
       return;
     }
     try {
-      const res = await axios.post('http://localhost:8081/api/tourism/users/login', { email: email.trim(), password });
+      const res = await axios.post(`${TOURISM_USERS_API}/login`, {
+        email: email.trim(),
+        password,
+      });
       login(res.data);
       navigate(from, { replace: true });
     } catch (err) {
