@@ -1,4 +1,8 @@
-const API_BASE = 'https://backend.peralpath.syaa.lk/api';
+// Use production API when running on the real domain, otherwise fall back to localhost for development.
+const API_BASE =
+  window.location.hostname === 'pearlpath.logozodev.com'
+    ? 'https://pearlpath.logozodev.com/api'
+    : 'http://localhost:4000/api';
 
 // Utility helpers
 async function apiRequest(path, options = {}) {
