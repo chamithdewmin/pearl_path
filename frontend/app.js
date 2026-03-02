@@ -1,17 +1,7 @@
-// Determine API base URL from current origin.
-// - On live (https://pearlpath.logozodev.com) -> https://pearlpath.logozodev.com/api
-// - On local dev (frontend at http://localhost:3000) -> http://localhost:4000/api
-let API_BASE;
-if (typeof window !== 'undefined') {
-  const origin = window.location.origin;
-  if (origin.includes('localhost:3000')) {
-    API_BASE = 'http://localhost:4000/api';
-  } else {
-    API_BASE = `${origin}/api`;
-  }
-} else {
-  API_BASE = 'http://localhost:4000/api';
-}
+// Fixed production API base URL for all environments.
+// All frontend calls go to the deployed backend:
+// https://pearlpath.logozodev.com/api
+const API_BASE = 'https://pearlpath.logozodev.com/api';
 
 // Auth helpers
 function getAuthToken() {
