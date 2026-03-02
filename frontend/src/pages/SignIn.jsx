@@ -65,9 +65,6 @@ export default function SignIn() {
         <p style={s.footer}>
           New here? <Link to="/signup" style={s.link}>Sign up</Link>
         </p>
-        <p style={s.footer}>
-          Admin? <Link to="/admin/login" style={s.link}>Go to admin login</Link>
-        </p>
       </div>
     </div>
   );

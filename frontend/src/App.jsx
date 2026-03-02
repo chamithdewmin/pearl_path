@@ -147,7 +147,8 @@ function App() {
             <Route path="/provinces/:slug" element={<PublicLayout><Province /></PublicLayout>} />
             <Route path="/signin" element={<PublicLayout><SignIn /></PublicLayout>} />
             <Route path="/signup" element={<PublicLayout><SignUp /></PublicLayout>} />
-            <Route path="/admin/login" element={<PublicLayout><AdminSignIn /></PublicLayout>} />
+            {/* Admin login uses a clean page without public navbar/footer */}
+            <Route path="/admin/login" element={<AdminSignIn />} />
 
             <Route
               path="/account"
