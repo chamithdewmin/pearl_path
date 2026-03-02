@@ -22,18 +22,26 @@ export default function AccountProfile() {
         const res = await axios.get(`${TOURISM_USERS_API}/me`, { withCredentials: false });
         if (!isMounted) return;
         const { name, phone, address, country } = res.data;
-        setProfileData((prev) => ({
-          ...prev,
-          fullName: name || prev.fullName,
-          phone: phone || prev.phone,
-          address: address || prev.address,
-          country: country || prev.country,
-        }));
-        setUser({
-          name: name || prev.fullName,
-          phone: phone || prev.phone,
-          address: address || prev.address,
-          country: country || prev.country,
+        setProfileData((prev) => {
+          const updatedFullName = name || prev.fullName;
+          const updatedPhone = phone || prev.phone;
+          const updatedAddress = address || prev.address;
+          const updatedCountry = country || prev.country;
+
+          setUser({
+            name: updatedFullName,
+            phone: updatedPhone,
+            address: updatedAddress,
+            country: updatedCountry,
+          });
+
+          return {
+            ...prev,
+            fullName: updatedFullName,
+            phone: updatedPhone,
+            address: updatedAddress,
+            country: updatedCountry,
+          };
         });
       } catch {
         // ignore, use local state
