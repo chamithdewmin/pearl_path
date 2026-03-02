@@ -68,10 +68,8 @@ export default function AdminUsers() {
                 <tr key={u._id} style={s.tr}>
                   <td style={s.td}>{u.name || '—'}</td>
                   <td style={s.td}>{u.email}</td>
-                  <td style={s.td}>
-                    <span className="pill pill-muted" style={{ textTransform: 'capitalize' }}>
-                      {u.role}
-                    </span>
+                  <td style={{ ...s.td, textTransform: 'capitalize', color: 'var(--color-text)' }}>
+                    {u.role}
                   </td>
                   <td style={s.td}>
                     <button
