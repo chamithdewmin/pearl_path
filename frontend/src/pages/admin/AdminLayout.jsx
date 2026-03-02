@@ -7,8 +7,8 @@ import AdminSidebar from '../../components/AdminSidebar';
 export default function AdminLayout() {
   const { user, isLoggedIn } = useAuth();
 
-  if (!isLoggedIn) return <Navigate to="/signin" replace />;
-  if (user?.role !== 'ADMIN') return <Navigate to="/" replace />;
+  if (!isLoggedIn) return <Navigate to="/admin/login" replace />;
+  if (user?.role !== 'ADMIN' && user?.role !== 'admin') return <Navigate to="/" replace />;
 
   return (
     <DashboardLayout sidebar={<AdminSidebar />} headerTitle="Admin panel">
