@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { ProfileIcon } from '../components/Icons';
 
 const DEMO_USERS = {
-  'admin@gmail.com': { fullName: 'Administrator', role: 'ADMIN', username: 'admin', phone: '' },
+  // Note: admin is intentionally NOT here.
   'tourist@gmail.com': { fullName: 'Demo Tourist', role: 'TOURIST', username: 'tourist', phone: '+94 77 123 4567' },
   'guide@gmail.com': { fullName: 'Demo Guide', role: 'GUIDE', username: 'guide', phone: '+94 77 234 5678' },
   'hotel@gmail.com': { fullName: 'Demo Hotel Owner', role: 'HOTEL_OWNER', username: 'hotel', phone: '+94 77 345 6789' },
@@ -34,7 +34,15 @@ export default function SignIn() {
         email: email.trim(),
         password,
       });
-      login(res.data);
+
+      const payload = res.data;
+      const role = payload?.user?.role || payload?.role;
+      if (role === 'admin' || role === 'ADMIN') {
+        alert('Admin accounts must use the admin sign-in page.');
+        return;
+      }
+
+      login(payload);
       navigate(from, { replace: true });
     } catch (err) {
       alert(err.response?.status === 401 ? 'Wrong email or password.' : 'Login failed.');
@@ -56,6 +64,9 @@ export default function SignIn() {
         </form>
         <p style={s.footer}>
           New here? <Link to="/signup" style={s.link}>Sign up</Link>
+        </p>
+        <p style={s.footer}>
+          Admin? <Link to="/admin/login" style={s.link}>Go to admin login</Link>
         </p>
       </div>
     </div>

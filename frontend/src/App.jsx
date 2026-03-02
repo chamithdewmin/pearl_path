@@ -15,6 +15,7 @@ import Province from './pages/Province';
 import Provinces from './pages/Provinces';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
+import AdminSignIn from './pages/AdminSignIn';
 import AccountLayout from './pages/account/AccountLayout';
 import AccountOverview from './pages/account/AccountOverview';
 import AccountHotels from './pages/account/AccountHotels';
@@ -31,11 +32,44 @@ import AdminHotels from './pages/admin/AdminHotels';
 import AdminBookings from './pages/admin/AdminBookings';
 
 const footerCols = [
-  { title: 'Support', links: [{ label: 'Contact us', to: '/contact' }, { label: 'Sign in', to: '/signin' }, { label: 'Register', to: '/signup' }] },
-  { title: 'Discover', links: [{ label: 'All-in-One package', to: '/all-in-one' }, { label: 'Southern Provinces', to: '/provinces' }] },
-  { title: 'Company', links: [{ label: 'About us', to: '/about' }, { label: 'Contact', to: '/contact' }] },
-  { title: 'Provinces', links: [{ label: 'Galle', to: '/provinces/galle' }, { label: 'Matara', to: '/provinces/matara' }, { label: 'Hambantota', to: '/provinces/hambantota' }] },
-  { title: 'Account', links: [{ label: 'My account', to: '/account' }, { label: 'Sign in', to: '/signin' }] },
+  {
+    title: 'Support',
+    links: [
+      { label: 'Contact us', to: '/contact' },
+      { label: 'Sign in', to: '/signin' },
+      { label: 'Register', to: '/signup' },
+    ],
+  },
+  {
+    title: 'Discover',
+    links: [
+      { label: 'All-in-One package', to: '/all-in-one' },
+      { label: 'Southern Provinces', to: '/provinces' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About us', to: '/about' },
+      { label: 'Contact', to: '/contact' },
+    ],
+  },
+  {
+    title: 'Provinces',
+    links: [
+      { label: 'Galle', to: '/provinces/galle' },
+      { label: 'Matara', to: '/provinces/matara' },
+      { label: 'Hambantota', to: '/provinces/hambantota' },
+    ],
+  },
+  {
+    title: 'Account',
+    links: [
+      { label: 'My account', to: '/account' },
+      { label: 'Sign in', to: '/signin' },
+      { label: 'Admin login', to: '/admin/login' },
+    ],
+  },
 ];
 
 function PublicLayout({ children }) {
@@ -114,6 +148,7 @@ function App() {
             <Route path="/provinces/:slug" element={<PublicLayout><Province /></PublicLayout>} />
             <Route path="/signin" element={<PublicLayout><SignIn /></PublicLayout>} />
             <Route path="/signup" element={<PublicLayout><SignUp /></PublicLayout>} />
+            <Route path="/admin/login" element={<PublicLayout><AdminSignIn /></PublicLayout>} />
 
             <Route
               path="/account"
