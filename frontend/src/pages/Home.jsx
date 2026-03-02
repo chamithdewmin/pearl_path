@@ -194,20 +194,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Popular with travelers */}
-        <section className="sec-booking">
-          <div className="sec-t-booking" style={{ marginBottom: 16 }}>Popular with travelers from Sri Lanka</div>
-          <div className="ptabs-booking">
-            {['Popular cities', 'International cities', 'Regions', 'Countries', 'Places to stay'].map((t) => (
-              <button key={t} type="button" className={`ptab-booking ${popTab === t ? 'active' : ''}`} onClick={() => setPopTab(t)}>{t}</button>
-            ))}
-          </div>
-          <div className="plinks-booking">
-            {popularLinks.map((l, i) => (
-              <Link to="/all-in-one" className="plink-booking" key={i}>{l}</Link>
-            ))}
-          </div>
-        </section>
       </div>
     </>
   );
