@@ -1,7 +1,9 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LoadingProvider, useLoading } from './context/LoadingContext';
 import PublicNavbar from './components/PublicNavbar';
+import GlobalLoadingBar from './components/GlobalLoadingBar';
 
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
@@ -79,57 +81,76 @@ function RequireAdmin({ children }) {
   return children;
 }
 
+function RouteLoadingTracker() {
+  const location = useLocation();
+  const { showLoading, hideLoading } = useLoading();
+
+  React.useEffect(() => {
+    showLoading();
+    const timeout = setTimeout(() => {
+      hideLoading();
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [location.pathname, showLoading, hideLoading]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
-          <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
-          <Route path="/contact" element={<PublicLayout><ContactUs /></PublicLayout>} />
-          <Route path="/all-in-one" element={<PublicLayout><AllInOne /></PublicLayout>} />
-          <Route path="/car-rental" element={<PublicLayout><CarRental /></PublicLayout>} />
-          <Route path="/guides" element={<PublicLayout><Guides /></PublicLayout>} />
-          <Route path="/provinces" element={<PublicLayout><Provinces /></PublicLayout>} />
-          <Route path="/provinces/:slug" element={<PublicLayout><Province /></PublicLayout>} />
-          <Route path="/signin" element={<PublicLayout><SignIn /></PublicLayout>} />
-          <Route path="/signup" element={<PublicLayout><SignUp /></PublicLayout>} />
+      <LoadingProvider>
+        <BrowserRouter>
+          <GlobalLoadingBar />
+          <RouteLoadingTracker />
+          <Routes>
+            <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+            <Route path="/about" element={<PublicLayout><AboutUs /></PublicLayout>} />
+            <Route path="/contact" element={<PublicLayout><ContactUs /></PublicLayout>} />
+            <Route path="/all-in-one" element={<PublicLayout><AllInOne /></PublicLayout>} />
+            <Route path="/car-rental" element={<PublicLayout><CarRental /></PublicLayout>} />
+            <Route path="/guides" element={<PublicLayout><Guides /></PublicLayout>} />
+            <Route path="/provinces" element={<PublicLayout><Provinces /></PublicLayout>} />
+            <Route path="/provinces/:slug" element={<PublicLayout><Province /></PublicLayout>} />
+            <Route path="/signin" element={<PublicLayout><SignIn /></PublicLayout>} />
+            <Route path="/signup" element={<PublicLayout><SignUp /></PublicLayout>} />
 
-          <Route
-            path="/account"
-            element={(
-              <RequireAuth>
-                <AccountLayout />
-              </RequireAuth>
-            )}
-          >
-            <Route index element={<AccountProfile />} />
-            <Route path="hotels" element={<AccountHotels />} />
-            <Route path="vehicles" element={<AccountVehicles />} />
-            <Route path="guides" element={<AccountGuides />} />
-            <Route path="bookings" element={<AccountBookings />} />
-            <Route path="profile" element={<AccountProfile />} />
-          </Route>
+            <Route
+              path="/account"
+              element={(
+                <RequireAuth>
+                  <AccountLayout />
+                </RequireAuth>
+              )}
+            >
+              <Route index element={<AccountProfile />} />
+              <Route path="hotels" element={<AccountHotels />} />
+              <Route path="vehicles" element={<AccountVehicles />} />
+              <Route path="guides" element={<AccountGuides />} />
+              <Route path="bookings" element={<AccountBookings />} />
+              <Route path="profile" element={<AccountProfile />} />
+            </Route>
 
-          <Route
-            path="/admin"
-            element={(
-              <RequireAdmin>
-                <AdminLayout />
-              </RequireAdmin>
-            )}
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="guides" element={<AdminGuides />} />
-            <Route path="vehicles" element={<AdminVehicles />} />
-            <Route path="hotels" element={<AdminHotels />} />
-            <Route path="bookings" element={<AdminBookings />} />
-          </Route>
+            <Route
+              path="/admin"
+              element={(
+                <RequireAdmin>
+                  <AdminLayout />
+                </RequireAdmin>
+              )}
+            >
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="guides" element={<AdminGuides />} />
+              <Route path="vehicles" element={<AdminVehicles />} />
+              <Route path="hotels" element={<AdminHotels />} />
+              <Route path="bookings" element={<AdminBookings />} />
+            </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </LoadingProvider>
     </AuthProvider>
   );
 }
