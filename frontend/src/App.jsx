@@ -109,9 +109,8 @@ function RequireAdmin({ children }) {
   const { user } = useAuth();
   const role = user?.role;
   const isAdmin = role === 'ADMIN' || role === 'admin';
-  if (!isAdmin) {
-    return <Navigate to="/account" replace />;
-  }
+  if (!user) return <Navigate to="/admin/login" replace />;
+  if (!isAdmin) return <Navigate to="/account" replace />;
   return children;
 }
 
