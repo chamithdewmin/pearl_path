@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { EditIcon, DeleteIcon } from '../../components/Icons';
+import { DeleteIcon } from '../../components/Icons';
 import { API_ROOT, getAuthHeaders } from '../../config/api';
 
 export default function AdminUsers() {
@@ -30,34 +30,6 @@ export default function AdminUsers() {
       cancelled = true;
     };
   }, []);
-
-  const handleRoleChange = async (id, nextRole) => {
-    const user = users.find((u) => u._id === id);
-    if (!user) return;
-
-    const isDefaultAdmin = user.email === 'admin@gmail.com';
-
-    // Frontend guard: do not allow changing tourist → admin, or changing main admin away from admin.
-    if (!isDefaultAdmin && nextRole === 'admin') {
-      alert('You cannot change a tourist into an admin. Only the main admin account stays admin.');
-      return;
-    }
-    if (isDefaultAdmin && nextRole !== 'admin') {
-      alert('The main admin role cannot be changed.');
-      return;
-    }
-
-    try {
-      const res = await axios.put(
-        `${API_ROOT}/admin/users/${id}`,
-        { role: nextRole },
-        { headers: getAuthHeaders() },
-      );
-      setUsers((prev) => prev.map((u) => (u._id === id ? res.data : u)));
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update user role');
-    }
-  };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this user?')) return;
@@ -97,26 +69,11 @@ export default function AdminUsers() {
                   <td style={s.td}>{u.name || '—'}</td>
                   <td style={s.td}>{u.email}</td>
                   <td style={s.td}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                      <span className="pill pill-muted" style={{ textTransform: 'capitalize' }}>
-                        {u.role}
-                      </span>
-                      <select
-                        value={u.role}
-                        onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                        className="input-enterprise"
-                        style={{ padding: '4px 8px', fontSize: 12 }}
-                        disabled={u.email === 'admin@gmail.com'}
-                      >
-                        <option value="tourist">tourist</option>
-                        <option value="admin">admin</option>
-                      </select>
-                    </div>
+                    <span className="pill pill-muted" style={{ textTransform: 'capitalize' }}>
+                      {u.role}
+                    </span>
                   </td>
                   <td style={s.td}>
-                    <button type="button" style={s.iconBtn} title="Edit">
-                      <EditIcon size={18} />
-                    </button>
                     <button
                       type="button"
                       style={s.iconBtn}
