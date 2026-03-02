@@ -25,11 +25,9 @@ RUN npm run build
 # Serve the built assets with nginx
 FROM nginx:alpine
 
-WORKDIR /usr/share/nginx/html
-
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/dist ./
+COPY --from=builder /app/build /usr/share/nginx/html
 
 RUN chown -R nginx:nginx /usr/share/nginx/html
 
