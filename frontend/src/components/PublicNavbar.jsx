@@ -20,7 +20,6 @@ const TABS = [
   { label: 'Stays', to: '/', end: true, icon: <IconBed /> },
   { label: 'Car rental', to: '/car-rental', end: true, icon: <IconCar /> },
   { label: 'Guides', to: '/guides', end: true, icon: <GuideIcon size={18} color="currentColor" /> },
-  { label: 'Attractions', to: '/provinces', icon: <IconCompass /> },
   { label: 'All-in-One', to: '/all-in-one', icon: null },
 ];
 
@@ -92,9 +91,6 @@ export default function PublicNavbar() {
           <NavLink to="/contact" className={({ isActive }) => `nav-tab-booking ${isActive ? 'active' : ''}`}>Contact</NavLink>
         </div>
         <div className="nav-actions-booking">
-          <button type="button" className="nav-flag-booking" aria-label="Currency">
-            <IconGlobe /> LKR
-          </button>
           {user ? (
             <>
               {displayName && (
@@ -102,13 +98,16 @@ export default function PublicNavbar() {
                   {displayName}
                 </span>
               )}
-              <Link
-                to={user.role === 'ADMIN' || user.role === 'admin' ? '/admin' : '/account'}
+              <button
+                type="button"
                 className="nbtn-booking out"
+                onClick={() => {
+                  logout();
+                  navigate('/');
+                }}
               >
-                {user.role === 'ADMIN' || user.role === 'admin' ? 'Admin panel' : 'My account'}
-              </Link>
-              <button type="button" className="nbtn-booking out" onClick={() => { logout(); navigate('/'); }}>Sign out</button>
+                Sign out
+              </button>
             </>
           ) : (
             <>
