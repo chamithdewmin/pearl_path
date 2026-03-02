@@ -71,11 +71,13 @@ export default function AdminUsers() {
     }
   };
 
+  const visibleUsers = users.filter((u) => u.email !== 'admin@gmail.com');
+
   return (
     <div>
       <h1 style={s.title}>Users</h1>
       <p style={s.subtitle}>
-        {loading ? 'Loading users...' : `Total registered: ${users.length}`}
+        {loading ? 'Loading users...' : `Total registered: ${visibleUsers.length}`}
       </p>
       <div className="card-enterprise" style={s.tableWrap}>
         <table style={s.table}>
@@ -85,12 +87,12 @@ export default function AdminUsers() {
               <tr>
                 <td colSpan={4} style={s.td}>Loading users...</td>
               </tr>
-            ) : users.length === 0 ? (
+            ) : visibleUsers.length === 0 ? (
               <tr>
                 <td colSpan={4} style={s.td}>No users found.</td>
               </tr>
             ) : (
-              users.map((u) => (
+              visibleUsers.map((u) => (
                 <tr key={u._id} style={s.tr}>
                   <td style={s.td}>{u.name || '—'}</td>
                   <td style={s.td}>{u.email}</td>
