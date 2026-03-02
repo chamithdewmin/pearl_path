@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import { ProfileIcon } from '../../components/Icons';
-import { TOURISM_USERS_API } from '../../config/api';
+import { TOURISM_USERS_API, getAuthHeaders } from '../../config/api';
 
 export default function AccountProfile() {
   const { user, setUser } = useOutletContext();
@@ -19,7 +19,9 @@ export default function AccountProfile() {
     let isMounted = true;
     (async () => {
       try {
-        const res = await axios.get(`${TOURISM_USERS_API}/me`, { withCredentials: false });
+        const res = await axios.get(`${TOURISM_USERS_API}/me`, {
+          headers: getAuthHeaders(),
+        });
         if (!isMounted) return;
         const { name, phone, address, country } = res.data;
         setProfileData((prev) => {
@@ -64,7 +66,9 @@ export default function AccountProfile() {
       if (profileData.newPassword) {
         payload.newPassword = profileData.newPassword;
       }
-      const res = await axios.put(`${TOURISM_USERS_API}/me`, payload, { withCredentials: false });
+      const res = await axios.put(`${TOURISM_USERS_API}/me`, payload, {
+        headers: getAuthHeaders(),
+      });
       setUser({
         name: res.data.name,
         phone: res.data.phone,

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Booking from '../../components/Booking';
-import { TOURISM_BOOKINGS_API } from '../../config/api';
+import { TOURISM_BOOKINGS_API, getAuthHeaders } from '../../config/api';
 
 export default function AccountBookings() {
   const [bookings, setBookings] = useState([]);
@@ -11,7 +11,9 @@ export default function AccountBookings() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await axios.get(TOURISM_BOOKINGS_API);
+        const res = await axios.get(TOURISM_BOOKINGS_API, {
+          headers: getAuthHeaders(),
+        });
         if (!cancelled) {
           setBookings(res.data || []);
         }
