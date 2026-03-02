@@ -3,9 +3,11 @@ import React, { createContext, useContext, useState } from 'react';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  // Read auth state from sessionStorage so login only lasts for the browser session,
+  // and is fully cleared when the user logs out or closes the tab.
   const [auth, setAuth] = useState(() => {
     try {
-      const saved = localStorage.getItem('southern_tourism_user');
+      const saved = sessionStorage.getItem('southern_tourism_user');
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -20,14 +22,14 @@ export function AuthProvider({ children }) {
     const next = data;
     setAuth(next);
     try {
-      localStorage.setItem('southern_tourism_user', JSON.stringify(next));
+      sessionStorage.setItem('southern_tourism_user', JSON.stringify(next));
     } catch (e) {}
   };
 
   const logout = () => {
     setAuth(null);
     try {
-      localStorage.removeItem('southern_tourism_user');
+      sessionStorage.removeItem('southern_tourism_user');
     } catch (e) {}
   };
 
