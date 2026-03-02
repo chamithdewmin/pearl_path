@@ -2,9 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret_in_production';
 
 // Use provided MongoDB URL by default, but allow override via env
 const DEFAULT_MONGODB_URI =
@@ -21,8 +24,9 @@ mongoose
   .connect(MONGODB_URI, {
     dbName: 'pearl_path',
   })
-  .then(() => {
+  .then(async () => {
     console.log('✅ Connected to MongoDB');
+    await ensureDefaultAdmin();
   })
   .catch((err) => {
     console.error('❌ MongoDB connection error:', err.message);
@@ -30,6 +34,19 @@ mongoose
 
 // Schemas & Models
 const { Schema } = mongoose;
+
+// User / Auth
+const userSchema = new Schema(
+  {
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    passwordHash: { type: String, required: true },
+    name: { type: String, trim: true },
+    role: { type: String, enum: ['admin', 'user'], default: 'user' },
+  },
+  { timestamps: true }
+);
+
+const User = mongoose.model('User', userSchema);
 
 // Tourist Management
 const touristSchema = new Schema(
@@ -133,10 +150,128 @@ const reviewSchema = new Schema(
 
 const Review = mongoose.model('Review', reviewSchema);
 
+// Ensure default admin user exists
+async function ensureDefaultAdmin() {
+  const adminEmail = 'admin@gmail.com';
+  const existing = await User.findOne({ email: adminEmail }).exec();
+  if (existing) {
+    return;
+  }
+  const plainPassword = '12345678';
+  const passwordHash = await bcrypt.hash(plainPassword, 10);
+  await User.create({
+    email: adminEmail,
+    passwordHash,
+    name: 'Admin',
+    role: 'admin',
+  });
+  console.log('✅ Default admin user created:', adminEmail);
+}
+
+// Auth routes
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+    const existing = await User.findOne({ email: email.toLowerCase() }).exec();
+    if (existing) {
+      return res.status(409).json({ message: 'Email already registered' });
+    }
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      email: email.toLowerCase(),
+      passwordHash,
+      name,
+      role: 'user',
+    });
+    res.status(201).json({
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+    const user = await User.findOne({ email: email.toLowerCase() }).exec();
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign(
+      { sub: user._id.toString(), role: user.role, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Auth middleware
+function authRequired(req, res, next) {
+  const authHeader = req.headers.authorization || '';
+  const [scheme, token] = authHeader.split(' ');
+  if (scheme !== 'Bearer' || !token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+}
+
+function adminRequired(req, res, next) {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+  next();
+}
+
+// Current user info
+app.get('/api/auth/me', authRequired, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.sub).select('-passwordHash').exec();
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Helper: generic CRUD handlers
 function registerCrudRoutes(app, basePath, Model, populate = []) {
   // Create
-  app.post(basePath, async (req, res) => {
+  app.post(basePath, authRequired, adminRequired, async (req, res) => {
     try {
       const item = new Model(req.body);
       const saved = await item.save();
@@ -178,7 +313,7 @@ function registerCrudRoutes(app, basePath, Model, populate = []) {
   });
 
   // Update
-  app.put(`${basePath}/:id`, async (req, res) => {
+  app.put(`${basePath}/:id`, authRequired, adminRequired, async (req, res) => {
     try {
       const updated = await Model.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
@@ -194,7 +329,7 @@ function registerCrudRoutes(app, basePath, Model, populate = []) {
   });
 
   // Delete
-  app.delete(`${basePath}/:id`, async (req, res) => {
+  app.delete(`${basePath}/:id`, authRequired, adminRequired, async (req, res) => {
     try {
       const deleted = await Model.findByIdAndDelete(req.params.id);
       if (!deleted) {

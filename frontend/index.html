@@ -13,12 +13,112 @@
   <body>
     <nav class="navbar navbar-dark bg-primary mb-4">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Pearl Path Admin</span>
+        <span class="navbar-brand mb-0 h1">Pearl Path</span>
         <span class="navbar-text text-light">Southern Sri Lanka Tourism</span>
+        <button class="btn btn-outline-light btn-sm" id="open-login-btn">
+          Admin Login
+        </button>
       </div>
     </nav>
 
-    <div class="container">
+    <!-- Public landing page -->
+    <div class="container mb-5" id="public-landing">
+      <div class="row align-items-center mb-4">
+        <div class="col-md-7">
+          <h1 class="display-5 fw-bold mb-3">Find your next stay in Southern Sri Lanka</h1>
+          <p class="lead text-muted">
+            Search authentic villas, beach hotels, vehicles and guided tours across the
+            Southern coast.
+          </p>
+          <div class="card card-body mt-3">
+            <div class="row g-2">
+              <div class="col-md-4">
+                <label class="form-label small mb-1">Destination</label>
+                <input type="text" class="form-control" placeholder="Galle, Matara, Mirissa..." />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small mb-1">Check-in</label>
+                <input type="date" class="form-control" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small mb-1">Check-out</label>
+                <input type="date" class="form-control" />
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" type="button">Search</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="card gradient-card text-light">
+            <div class="card-body">
+              <h5 class="card-title">Plan your perfect Southern journey</h5>
+              <p class="card-text small">
+                Browse hand‑picked stays, vehicles and local guides managed through our
+                Pearl Path partner network.
+              </p>
+              <ul class="small mb-0">
+                <li>Trusted local hotels and villas</li>
+                <li>Airport pickup and coastal transport</li>
+                <li>Certified tour guides for any language</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="mb-3">Browse by property type</h3>
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="card h-100">
+            <img src="https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=600" class="card-img-top" alt="Beach Hotels" />
+            <div class="card-body">
+              <h6 class="card-title">Beach Hotels</h6>
+              <p class="card-text small text-muted">Stay steps away from the Southern coast.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100">
+            <img src="https://images.pexels.com/photos/237272/pexels-photo-237272.jpeg?auto=compress&cs=tinysrgb&w=600" class="card-img-top" alt="Villas" />
+            <div class="card-body">
+              <h6 class="card-title">Private Villas</h6>
+              <p class="card-text small text-muted">Enjoy private pools and family spaces.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100">
+            <img src="https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=600" class="card-img-top" alt="Guest Houses" />
+            <div class="card-body">
+              <h6 class="card-title">Guest Houses</h6>
+              <p class="card-text small text-muted">Meet locals and discover hidden spots.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100">
+            <img src="https://images.pexels.com/photos/1402787/pexels-photo-1402787.jpeg?auto=compress&cs=tinysrgb&w=600" class="card-img-top" alt="Apartments" />
+            <div class="card-body">
+              <h6 class="card-title">Apartments</h6>
+              <p class="card-text small text-muted">Stay like a local with city comforts.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin panel (hidden until login) -->
+    <div class="container" id="admin-panel" style="display: none;">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0">Admin Panel</h2>
+        <div>
+          <span class="me-2 small text-muted" id="current-user-label"></span>
+          <button class="btn btn-outline-secondary btn-sm" id="logout-btn">Logout</button>
+        </div>
+      </div>
+
       <ul class="nav nav-tabs mb-3" id="entityTabs" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="tourists-tab" data-bs-toggle="tab" data-bs-target="#tourists" type="button" role="tab">
@@ -340,6 +440,32 @@
             </div>
           </form>
           <div id="review-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Admin Login</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="login-form">
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="login-email" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" id="login-password" required />
+              </div>
+              <div class="text-danger small mb-2" id="login-error" style="display:none;"></div>
+              <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

@@ -4,11 +4,45 @@ const API_BASE =
     ? 'https://pearlpath.logozodev.com/api'
     : 'http://localhost:4000/api';
 
+// Auth helpers
+function getAuthToken() {
+  return localStorage.getItem('pp_token');
+}
+
+function setAuth(token, user) {
+  localStorage.setItem('pp_token', token);
+  localStorage.setItem('pp_user', JSON.stringify(user));
+}
+
+function clearAuth() {
+  localStorage.removeItem('pp_token');
+  localStorage.removeItem('pp_user');
+}
+
+function getCurrentUser() {
+  const raw = localStorage.getItem('pp_user');
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
 // Utility helpers
 async function apiRequest(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+  const token = getAuthToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...options,
+    headers,
   });
   if (!res.ok) {
     const text = await res.text();
@@ -508,19 +542,105 @@ document.getElementById('review-reset').addEventListener('click', () => {
   document.getElementById('review-id').value = '';
 });
 
-// Initial load
+// Auth + UI wiring
+function showAdminPanel(user) {
+  const adminPanel = document.getElementById('admin-panel');
+  const landing = document.getElementById('public-landing');
+  const label = document.getElementById('current-user-label');
+  if (adminPanel && landing) {
+    adminPanel.style.display = '';
+    landing.style.display = 'none';
+  }
+  if (label && user) {
+    label.textContent = `${user.email} (${user.role})`;
+  }
+}
+
+function showPublicLanding() {
+  const adminPanel = document.getElementById('admin-panel');
+  const landing = document.getElementById('public-landing');
+  const label = document.getElementById('current-user-label');
+  if (adminPanel && landing) {
+    adminPanel.style.display = 'none';
+    landing.style.display = '';
+  }
+  if (label) {
+    label.textContent = '';
+  }
+}
+
+async function loadAllData() {
+  await Promise.all([
+    loadTourists(),
+    loadHotels(),
+    loadVehicles(),
+    loadGuides(),
+    loadBookings(),
+    loadReviews(),
+  ]);
+}
+
 async function init() {
-  try {
-    await Promise.all([
-      loadTourists(),
-      loadHotels(),
-      loadVehicles(),
-      loadGuides(),
-      loadBookings(),
-      loadReviews(),
-    ]);
-  } catch (err) {
-    alert('Error loading data. Make sure the backend is running: ' + err.message);
+  const loginModalEl = document.getElementById('loginModal');
+  const openLoginBtn = document.getElementById('open-login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const loginForm = document.getElementById('login-form');
+  const loginError = document.getElementById('login-error');
+
+  let loginModal = null;
+  if (loginModalEl && window.bootstrap) {
+    loginModal = new window.bootstrap.Modal(loginModalEl);
+  }
+
+  if (openLoginBtn && loginModal) {
+    openLoginBtn.addEventListener('click', () => {
+      loginError.style.display = 'none';
+      loginForm.reset();
+      loginModal.show();
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      clearAuth();
+      showPublicLanding();
+    });
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.style.display = 'none';
+      try {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const result = await apiRequest('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        });
+        setAuth(result.token, result.user);
+        if (loginModal) {
+          loginModal.hide();
+        }
+        showAdminPanel(result.user);
+        await loadAllData();
+      } catch (err) {
+        loginError.textContent = 'Invalid email or password';
+        loginError.style.display = 'block';
+      }
+    });
+  }
+
+  const existingUser = getCurrentUser();
+  if (existingUser) {
+    showAdminPanel(existingUser);
+    try {
+      await loadAllData();
+    } catch (err) {
+      alert('Error loading data. Make sure the backend is running: ' + err.message);
+    }
+  } else {
+    showPublicLanding();
   }
 }
 
