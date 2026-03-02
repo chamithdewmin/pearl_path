@@ -45,7 +45,10 @@ export default function PublicNavbar() {
   const [provincesOpen, setProvincesOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
-  const displayName = user?.fullName || user?.name || user?.email || '';
+  const role = user?.role;
+  const isAdmin = role === 'ADMIN' || role === 'admin';
+  const isNormalUser = !!user && !isAdmin;
+  const displayName = isNormalUser ? (user.fullName || user.name || user.email || '') : '';
 
   return (
     <nav className="nav-booking">
@@ -108,7 +111,7 @@ export default function PublicNavbar() {
           <NavLink to="/contact" className={({ isActive }) => `nav-tab-booking ${isActive ? 'active' : ''}`}>Contact</NavLink>
         </div>
         <div className="nav-actions-booking">
-          {user ? (
+          {isNormalUser ? (
             <div style={{ position: 'relative' }}>
               <button
                 type="button"

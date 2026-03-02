@@ -99,9 +99,10 @@ function PublicLayout({ children }) {
 
 function RequireAuth({ children }) {
   const { user } = useAuth();
-  if (!user) {
-    return <Navigate to="/signin" replace />;
-  }
+  if (!user) return <Navigate to="/signin" replace />;
+  const role = user?.role;
+  // Admins should use the admin panel, not the normal account area
+  if (role === 'ADMIN' || role === 'admin') return <Navigate to="/admin" replace />;
   return children;
 }
 

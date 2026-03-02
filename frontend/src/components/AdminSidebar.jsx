@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   HotelIcon,
   CarIcon,
@@ -7,6 +7,7 @@ import {
   BookingIcon,
   ProfileIcon,
 } from './Icons';
+import { useAuth } from '../context/AuthContext';
 
 const links = [
   { to: '/admin', end: true, label: 'Dashboard', Icon: null },
@@ -18,6 +19,9 @@ const links = [
 ];
 
 export default function AdminSidebar({ collapsed, onToggleCollapse, onHide }) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <aside style={sidebarStyle(collapsed)}>
       <div style={s.header}>
@@ -43,7 +47,16 @@ export default function AdminSidebar({ collapsed, onToggleCollapse, onHide }) {
       </nav>
       {!collapsed && (
         <div style={s.footer}>
-          <Link to="/account" style={s.accountLink}>My account →</Link>
+          <button
+            type="button"
+            style={s.accountLinkBtn}
+            onClick={() => {
+              logout();
+              navigate('/admin/login');
+            }}
+          >
+            Sign out of admin
+          </button>
           {onHide && (
             <button type="button" onClick={onHide} style={s.hideSidebarLink}>
               Hide sidebar
@@ -78,6 +91,18 @@ const s = {
   link: { display: 'flex', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', textDecoration: 'none', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)', fontWeight: 500 },
   linkActive: { background: 'var(--color-primary-light)', color: 'var(--color-primary)', fontWeight: 600 },
   footer: { padding: 'var(--space-3)', borderTop: '1px solid var(--color-border)' },
-  accountLink: { display: 'block', marginBottom: 'var(--space-2)', fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none' },
+  accountLinkBtn: {
+    display: 'block',
+    width: '100%',
+    marginBottom: 'var(--space-2)',
+    fontSize: 'var(--text-sm)',
+    fontWeight: 600,
+    color: 'var(--color-primary)',
+    background: 'none',
+    border: 'none',
+    textAlign: 'left',
+    padding: 0,
+    cursor: 'pointer',
+  },
   hideSidebarLink: { width: '100%', padding: 'var(--space-2)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', textAlign: 'left', borderRadius: 'var(--radius-sm)' },
 };
