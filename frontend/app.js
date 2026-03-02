@@ -1,7 +1,7 @@
 // Fixed production API base URL for all environments.
 // All frontend calls go to the deployed backend:
-// https://pearlpath.logozodev.com/api
-const API_BASE = 'https://pearlpath.logozodev.com/api';
+// https://demo.logozodev.com/api
+const API_BASE = 'https://demo.logozodev.com/api';
 
 // Auth helpers
 function getAuthToken() {
