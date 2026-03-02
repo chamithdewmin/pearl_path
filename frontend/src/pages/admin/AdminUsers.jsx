@@ -32,6 +32,21 @@ export default function AdminUsers() {
   }, []);
 
   const handleRoleChange = async (id, nextRole) => {
+    const user = users.find((u) => u._id === id);
+    if (!user) return;
+
+    const isDefaultAdmin = user.email === 'admin@gmail.com';
+
+    // Frontend guard: do not allow changing tourist → admin, or changing main admin away from admin.
+    if (!isDefaultAdmin && nextRole === 'admin') {
+      alert('You cannot change a tourist into an admin. Only the main admin account stays admin.');
+      return;
+    }
+    if (isDefaultAdmin && nextRole !== 'admin') {
+      alert('The main admin role cannot be changed.');
+      return;
+    }
+
     try {
       const res = await axios.put(
         `${API_ROOT}/admin/users/${id}`,
@@ -89,9 +104,9 @@ export default function AdminUsers() {
                         onChange={(e) => handleRoleChange(u._id, e.target.value)}
                         className="input-enterprise"
                         style={{ padding: '4px 8px', fontSize: 12 }}
+                        disabled={u.email === 'admin@gmail.com'}
                       >
                         <option value="tourist">tourist</option>
-                        <option value="provider">provider</option>
                         <option value="admin">admin</option>
                       </select>
                     </div>

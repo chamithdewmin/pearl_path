@@ -481,11 +481,29 @@ app.put('/api/admin/users/:id', authRequired, adminRequired, async (req, res) =>
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const isDefaultAdmin = user.email === 'admin@gmail.com';
+
     if (typeof name === 'string') user.name = name;
     if (typeof phone === 'string') user.phone = phone;
     if (typeof address === 'string') user.address = address;
     if (typeof country === 'string') user.country = country;
-    if (role && ['admin', 'tourist', 'provider'].includes(role)) {
+    if (role) {
+      // Only support two main roles through this endpoint
+      const allowedRoles = ['admin', 'tourist'];
+      if (!allowedRoles.includes(role)) {
+        return res.status(400).json({ message: 'Invalid role' });
+      }
+
+      // Do not allow promoting normal users (tourists) to admin
+      if (role === 'admin' && !isDefaultAdmin) {
+        return res.status(400).json({ message: 'Only the main admin account can have the admin role' });
+      }
+
+      // Do not allow demoting the main admin
+      if (isDefaultAdmin && role !== 'admin') {
+        return res.status(400).json({ message: 'Main admin role cannot be changed' });
+      }
+
       user.role = role;
     }
 
