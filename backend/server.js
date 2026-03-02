@@ -105,6 +105,7 @@ const vehicleSchema = new Schema(
     model: { type: String, trim: true },
     pricePerDay: { type: Number, required: true },
     district: { type: String, enum: VALID_DISTRICTS, trim: true },
+    imageUrl: { type: String, trim: true },
     availabilityStatus: {
       type: String,
       enum: ['available', 'unavailable', 'maintenance'],
@@ -126,6 +127,7 @@ const guideSchema = new Schema(
     name: { type: String, required: true, trim: true },
     languages: [{ type: String, trim: true }],
     district: { type: String, enum: VALID_DISTRICTS, trim: true },
+    imageUrl: { type: String, trim: true },
     licenseNumber: { type: String, trim: true },
     isLicenseVerified: { type: Boolean, default: false },
     yearsExperience: { type: Number },
@@ -436,6 +438,72 @@ app.get('/api/auth/me', authRequired, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Admin overview stats
+app.get('/api/admin/overview', authRequired, adminRequired, async (req, res) => {
+  try {
+    const [userCount, hotelCount, vehicleCount, guideCount, bookingCount] = await Promise.all([
+      User.countDocuments().exec(),
+      Hotel.countDocuments().exec(),
+      Vehicle.countDocuments().exec(),
+      Guide.countDocuments().exec(),
+      Booking.countDocuments().exec(),
+    ]);
+    res.json({ userCount, hotelCount, vehicleCount, guideCount, bookingCount });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Admin user management
+app.get('/api/admin/users', authRequired, adminRequired, async (req, res) => {
+  try {
+    const users = await User.find().select('-passwordHash').sort({ createdAt: -1 }).exec();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.put('/api/admin/users/:id', authRequired, adminRequired, async (req, res) => {
+  try {
+    const { name, phone, address, country, role } = req.body;
+    const user = await User.findById(req.params.id).exec();
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (typeof name === 'string') user.name = name;
+    if (typeof phone === 'string') user.phone = phone;
+    if (typeof address === 'string') user.address = address;
+    if (typeof country === 'string') user.country = country;
+    if (role && ['admin', 'tourist', 'provider'].includes(role)) {
+      user.role = role;
+    }
+
+    const saved = await user.save();
+    const plain = saved.toObject();
+    delete plain.passwordHash;
+    res.json(plain);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.delete('/api/admin/users/:id', authRequired, adminRequired, async (req, res) => {
+  try {
+    if (req.user.sub === req.params.id) {
+      return res.status(400).json({ message: 'Admins cannot delete their own account' });
+    }
+    const deleted = await User.findByIdAndDelete(req.params.id).exec();
+    if (!deleted) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'User deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
